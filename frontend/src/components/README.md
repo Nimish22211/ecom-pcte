@@ -28,17 +28,24 @@ No props needed.
 Handles uploading images to Cloudinary. Used only in `SellPage.jsx`.
 
 - Lets the user pick up to 3 image files
-- Uploads each file to Cloudinary using the `uploadImage` helper and gets back a secure URL
+- Uploads all files to Cloudinary using the `uploadImages` helper and gets back secure URLs
 - Calls `onUploadComplete([url1, url2, ...])` when all uploads finish
 
 Props: `onUploadComplete` (function), `maxImages` (number, default 3).
 
-Your senior has set up Cloudinary — import `uploadImage` from `../cloudinary`:
+Your senior has set up Cloudinary in `../cloudinary.js` — import `uploadImages`:
 
 ```jsx
-import { uploadImage } from '../cloudinary';
+import { uploadImages } from '../cloudinary';
+import { useAuth } from '../context/AuthContext';
 
-const url = await uploadImage(file, user._id);
+const { user } = useAuth();
+
+const handleFiles = async (e) => {
+  const files = Array.from(e.target.files).slice(0, maxImages);
+  const urls = await uploadImages(files, user._id);
+  onUploadComplete(urls);
+};
 ```
 
 ### ProtectedRoute.jsx
