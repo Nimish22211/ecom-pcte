@@ -6,6 +6,7 @@ const studentSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   rollNumber: { type: String, required: true },
   collegeId: { type: mongoose.Schema.Types.ObjectId, ref: 'College', required: true },
+  role: { type: String, default: 'student' },
   status: { type: String, enum: ['unverified', 'verified'], default: 'unverified' },
   createdAt: { type: Date, default: Date.now },
 });

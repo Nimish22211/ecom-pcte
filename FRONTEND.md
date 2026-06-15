@@ -1,7 +1,7 @@
 # Frontend Guide — CampusCart
 ## For: React Teammate (Beginner Friendly)
 
-**Stack:** React + Vite, Axios, Socket.IO Client, Firebase Auth (Email/Password), Firebase Storage, TailwindCSS
+**Stack:** React + Vite, Axios, Socket.IO Client, Firebase Auth (Email/Password), Cloudinary, TailwindCSS
 
 > **How to read this:** This file tells you exactly what pages to build, what files to create, what design to use, and how each page connects to the backend API. You do not need to understand the backend. Your job is to build the UI and call the right functions from the right place.
 
@@ -17,7 +17,7 @@ client/
     │   ├── Navbar.jsx
     │   ├── ProductCard.jsx
     │   ├── Loader.jsx
-    │   ├── ImageUploader.jsx  ← Handles Firebase Storage upload
+    │   ├── ImageUploader.jsx  ← Handles Cloudinary upload
     │   └── ProtectedRoute.jsx
     ├── pages/
     │   ├── LandingPage.jsx
@@ -40,7 +40,8 @@ client/
     │   └── AuthContext.jsx    ← Stores logged-in user globally
     ├── services/
     │   └── api.js             ← All Axios API calls in one place
-    ├── firebase.js            ← Firebase setup (your senior configures this)
+    ├── firebase.js            ← Firebase setup - Auth only (your senior configures this)
+    ├── cloudinary.js          ← Cloudinary upload helper (your senior configures this)
     ├── socket.js              ← Socket.IO client (your senior configures this)
     └── App.jsx                ← All routes defined here
 ```
@@ -154,9 +155,9 @@ const Navbar = () => {
 
 ---
 
-## 5. How Image Upload Works (Firebase Storage)
+## 5. How Image Upload Works (Cloudinary)
 
-Images are uploaded directly from the browser to Firebase Storage — the backend never handles the image file, it only receives the final URL.
+Images are uploaded directly from the browser to Cloudinary — the backend never handles the image file, it only receives the final URL.
 
 The `ImageUploader` component handles all of this. You just use it in `SellPage`:
 
@@ -166,8 +167,8 @@ The `ImageUploader` component handles all of this. You just use it in `SellPage`
 ```
 
 When the user picks files, `ImageUploader`:
-1. Uploads each file to Firebase Storage
-2. Gets back a public URL for each
+1. Uploads each file to Cloudinary using an unsigned upload preset
+2. Gets back a secure URL for each
 3. Calls `onUploadComplete([url1, url2, url3])`
 
 You store those URLs in state and include them when submitting the listing form.
@@ -325,7 +326,7 @@ A form to create a new product listing:
 | Description | Textarea | Required |
 | Price | Number input | In ₹, required |
 | Category | Dropdown | Books, Electronics, Notes, Stationery, Hostel, Other |
-| Images | `ImageUploader` component | Max 3 images, uploaded to Firebase Storage |
+| Images | `ImageUploader` component | Max 3 images, uploaded to Cloudinary |
 
 - **"Post Listing"** submit button
 - Show a loading spinner while submitting

@@ -25,15 +25,28 @@ A simple centered loading spinner. Show this while any page is fetching data fro
 No props needed.
 
 ### ImageUploader.jsx
-Handles uploading images to Firebase Storage. Used only in `SellPage.jsx`.
+Handles uploading images to Cloudinary. Used only in `SellPage.jsx`.
 
 - Lets the user pick up to 3 image files
-- Uploads each file to Firebase Storage and gets back a public URL
+- Uploads all files to Cloudinary using the `uploadImages` helper and gets back secure URLs
 - Calls `onUploadComplete([url1, url2, ...])` when all uploads finish
 
 Props: `onUploadComplete` (function), `maxImages` (number, default 3).
 
-Your senior has set up Firebase Storage — import `storage` from `../firebase`.
+Your senior has set up Cloudinary in `../cloudinary.js` — import `uploadImages`:
+
+```jsx
+import { uploadImages } from '../cloudinary';
+import { useAuth } from '../context/AuthContext';
+
+const { user } = useAuth();
+
+const handleFiles = async (e) => {
+  const files = Array.from(e.target.files).slice(0, maxImages);
+  const urls = await uploadImages(files, user._id);
+  onUploadComplete(urls);
+};
+```
 
 ### ProtectedRoute.jsx
 A wrapper component that guards pages from being accessed without login.

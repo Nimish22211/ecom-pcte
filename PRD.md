@@ -2,7 +2,7 @@
 ## CampusCart — College Student Marketplace
 
 **Version:** 1.1
-**Stack:** React + Vite, Node.js + Express, MongoDB, Socket.IO, Firebase Auth (Email/Password), Firebase Storage
+**Stack:** React + Vite, Node.js + Express, MongoDB, Socket.IO, Firebase Auth (Email/Password), Cloudinary
 **Audience:** College students (buyers & sellers), College Dean (admin)
 
 ---
@@ -139,7 +139,7 @@ Store `idToken` in `localStorage`. Refresh it using Firebase's `onAuthStateChang
   description,
   price,              // in ₹ (number)
   category,           // "Books" | "Electronics" | "Notes" | "Stationery" | "Hostel" | "Other"
-  images: [String],   // Firebase Storage URLs (max 3)
+  images: [String],   // Cloudinary secure URLs (max 3)
   sellerId: ObjectId,
   collegeId: ObjectId,
   status: "available" | "sold",
@@ -176,28 +176,38 @@ Store `idToken` in `localStorage`. Refresh it using Firebase's `onAuthStateChang
 
 ---
 
-## 6. Image Upload — Firebase Storage
+## 6. Image Upload — Cloudinary
 
-- Images are uploaded **directly from the frontend** to Firebase Storage
+- Images are uploaded **directly from the frontend** to Cloudinary using an unsigned upload preset
 - No image handling on the backend at all
-- Frontend uploads → gets back a download URL → sends that URL to backend when creating a listing
+- Frontend uploads → gets back a secure URL → sends that URL to backend when creating a listing
 - Max 3 images per listing
 - Allowed types: jpg, jpeg, png, webp
-- Storage path: `products/{userId}/{timestamp}_{filename}`
+- Cloudinary folder: `products/{userId}/`
 
 **Frontend upload flow:**
 ```js
-// 1. Upload to Firebase Storage
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+// 1. Upload to Cloudinary (unsigned upload preset)
+const formData = new FormData();
+formData.append("file", file);
+formData.append("upload_preset", import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
+formData.append("folder", `products/${userId}`);
 
-const storage = getStorage();
-const storageRef = ref(storage, `products/${userId}/${Date.now()}_${file.name}`);
-await uploadBytes(storageRef, file);
-const url = await getDownloadURL(storageRef);
+const res = await fetch(
+  `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`,
+  { method: "POST", body: formData }
+);
+const data = await res.json();
+const url = data.secure_url;
 
 // 2. Collect all URLs → send to backend in POST /api/products
 { images: [url1, url2, url3] }
 ```
+
+**Setup (developer):**
+1. Create a free account at cloudinary.com
+2. Note the **Cloud Name** from the dashboard
+3. Go to Settings → Upload → Add upload preset → set Signing Mode to **Unsigned** → note the preset name
 
 ---
 
@@ -344,13 +354,16 @@ FIREBASE_CLIENT_EMAIL=
 VITE_API_BASE_URL=http://localhost:5000/api
 VITE_SOCKET_URL=http://localhost:5000
 
-# Firebase client config
+# Firebase client config (Auth only)
 VITE_FIREBASE_API_KEY=
 VITE_FIREBASE_AUTH_DOMAIN=
 VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=    ← needed for Firebase Storage
 VITE_FIREBASE_MESSAGING_SENDER_ID=
 VITE_FIREBASE_APP_ID=
+
+# Cloudinary (unsigned upload preset)
+VITE_CLOUDINARY_CLOUD_NAME=
+VITE_CLOUDINARY_UPLOAD_PRESET=
 ```
 
 ---
@@ -369,7 +382,8 @@ campuscart/
 │   │   │   └── AuthContext.jsx
 │   │   ├── services/
 │   │   │   └── api.js
-│   │   ├── firebase.js            ← Firebase init (Auth + Storage)
+│   │   ├── firebase.js            ← Firebase init (Auth only)
+│   │   ├── cloudinary.js          ← Cloudinary upload helper
 │   │   ├── socket.js              ← Socket.IO client
 │   │   └── App.jsx
 │   └── vite.config.js
@@ -403,8 +417,8 @@ campuscart/
 ## 14. Developer Setup Checklist
 
 - [ ] Create Firebase project → enable **Email/Password** sign-in method
-- [ ] Enable Firebase Storage in the same project
 - [ ] Download Firebase Admin SDK service account JSON for backend
+- [ ] Create a free Cloudinary account → note Cloud Name → create an unsigned upload preset
 - [ ] Create MongoDB Atlas cluster (or run local)
 - [ ] Run `node server/scripts/seedDean.js` with dean's email + password + name
 - [ ] Fill in all `.env` variables for both client and server
