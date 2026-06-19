@@ -15,12 +15,19 @@ import PendingPage from "./pages/PendingPage";
 import Sell from "./pages/student/Sell";
 import Cart from "./pages/student/Cart";
 import DeanLoginPage from "./pages/admin/DeanLoginPage";
+import DeanDashboardPage from "./pages/admin/DeanDashboardPage";
+import StudentTablePage from "./pages/admin/StudentTablePage";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   const router = createBrowserRouter([
     {
       path: "/student",
-      element: <Layout />,
+      element: (
+        <ProtectedRoute role="student">
+          <Layout />
+        </ProtectedRoute>
+      ),
       children: [
         {
           path: "/student",
@@ -83,6 +90,22 @@ function App() {
     {
       path: "/admin/login",
       element: <DeanLoginPage />,
+    },
+    {
+      path: "/admin/dashboard",
+      element: (
+        <ProtectedRoute role="dean">
+          <DeanDashboardPage />
+        </ProtectedRoute>
+      ),
+    },
+    {
+      path: "/admin/students",
+      element: (
+        <ProtectedRoute role="dean">
+          <StudentTablePage />
+        </ProtectedRoute>
+      ),
     },
   ]);
   return (

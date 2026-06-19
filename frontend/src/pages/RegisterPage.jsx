@@ -1,19 +1,45 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
+import { getColleges, studentRegister } from "../services/api";
 
 function RegisterPage() {
   const [name, setName] = useState("");
   const [rollNumber, setRollNumber] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [college, setCollege] = useState("");
+  const [collegeId, setCollegeId] = useState("");
+  const [colleges, setColleges] = useState([]);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const handleSubmit = (e) => {
+
+  useEffect(() => {
+    getColleges()
+      .then(({ data }) => setColleges(data))
+      .catch(() => setError("Could not load colleges. Please refresh."));
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate("/pending");
+    setError("");
+    if (!collegeId) return setError("Please select your college");
+    setLoading(true);
+    try {
+      const credential = await createUserWithEmailAndPassword(auth, email, password);
+      const firebaseToken = await credential.user.getIdToken();
+      await studentRegister({ firebaseToken, name, rollNumber, collegeId });
+      navigate("/pending");
+    } catch (err) {
+      setError(
+        err.response?.data?.message || err.message || "Registration failed. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -26,6 +52,11 @@ function RegisterPage() {
           <p className="text-center text-slate-500 mt-2 mb-6">
             Create your student account
           </p>
+          {error && (
+            <p className="bg-red-50 text-red-700 text-sm rounded-lg px-4 py-2 mb-4">
+              {error}
+            </p>
+          )}
           <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <div className="flex flex-col">
               <input
@@ -34,6 +65,7 @@ function RegisterPage() {
                 className="border rounded-lg px-4 py-2 bg-slate-50"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                required
               />
             </div>
             <div className="flex flex-col">
@@ -43,6 +75,7 @@ function RegisterPage() {
                 className="border rounded-lg px-4 py-2 bg-slate-50"
                 value={rollNumber}
                 onChange={(e) => setRollNumber(e.target.value)}
+                required
               />
             </div>
             <div className="flex flex-col">
@@ -52,6 +85,7 @@ function RegisterPage() {
                 className="border rounded-lg px-4 py-2 bg-slate-50"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
             <div className="flex flex-col">
@@ -61,22 +95,29 @@ function RegisterPage() {
                 className="border rounded-lg px-4 py-2 bg-slate-50"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
               />
             </div>
             <select
               className="border rounded-lg px-4 py-2 bg-slate-50"
-              value={college}
-              onChange={(e) => setCollege(e.target.value)}
+              value={collegeId}
+              onChange={(e) => setCollegeId(e.target.value)}
+              required
             >
-              <option>Select College</option>
-              <option>PCTE</option>
-              <option>MIT</option>
+              <option value="">Select College</option>
+              {colleges.map((college) => (
+                <option key={college._id} value={college._id}>
+                  {college.name}
+                </option>
+              ))}
             </select>
             <button
               type="submit"
-              className="mt-2 bg-blue-700 text-white py-2 rounded-lg hover:bg-blue-800"
+              disabled={loading}
+              className="mt-2 bg-blue-700 text-white py-2 rounded-lg hover:bg-blue-800 disabled:opacity-60"
             >
-              Register
+              {loading ? "Creating account..." : "Register"}
             </button>
             <p className="text-center mt-4">
               Already have an account?
