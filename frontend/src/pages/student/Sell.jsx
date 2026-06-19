@@ -1,25 +1,39 @@
 import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ImageUploader from "../../components/ImageUploader";
+import { createListing } from "../../services/api";
+
+const CATEGORIES = ["Books", "Electronics", "Notes", "Stationery", "Hostel", "Other"];
 
 function Sell() {
-  function handlesubmit(e) {
-    e.preventDefault();
-  }
   const [title, setTitle] = useState("");
-  const [detail, setDetail] = useState("");
+  const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [group, setGroup] = useState("");
+  const [category, setCategory] = useState("");
   const [imageUrls, setImageUrls] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
-  const handleSubmit = async () => {
-    if (imageUrls.length === 0)
-      return alert("Please upload at least one image");
-    const data = { title, description, price, category, images: imageUrls };
-    await createListing(data); 
-    navigate("/my-listings");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    if (imageUrls.length === 0) return setError("Please upload at least one image");
+    if (!category) return setError("Please select a category");
+
+    setLoading(true);
+    try {
+      const data = { title, description, price: Number(price), category, images: imageUrls };
+      await createListing(data);
+      navigate("/student/my-listing");
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to create listing");
+    } finally {
+      setLoading(false);
+    }
   };
+
   return (
     <>
       <div className="min-h-screen flex flex-col justify-center items-center ">
@@ -33,7 +47,13 @@ function Sell() {
             </p>
           </div>
 
-          <form className="flex flex-col gap-4" onSubmit={handlesubmit}>
+          {error && (
+            <p className="bg-red-50 text-red-700 text-sm rounded-lg px-4 py-2 mb-4">
+              {error}
+            </p>
+          )}
+
+          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
             <h2 className="font-semibold">1. Product Details</h2>
             <div className="flex flex-col gap-2">
               <input
@@ -42,15 +62,17 @@ function Sell() {
                 className="border rounded-lg px-4 py-2  "
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                required
               />
               <textarea
                 placeholder="Product Description"
                 className="border rounded-lg px-4 py-2  "
-                value={detail}
-                onChange={(e) => setDetail(e.target.value)}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
               />
             </div>
-            <h2 className="font-semibold">2. Pricing & Catergory</h2>
+            <h2 className="font-semibold">2. Pricing & Category</h2>
             <div className="flex flex-col gap-2">
               <input
                 type="number"
@@ -58,28 +80,29 @@ function Sell() {
                 className="border rounded-lg px-4 py-2  "
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
+                required
+                min={1}
               />
               <select
                 className="border rounded-lg px-4 py-2"
-                value={group}
-                onChange={(e) => setGroup(e.target.value)}
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                required
               >
-                <option value="Select">Select Catergory</option>
+                <option value="">Select Category</option>
+                {CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
               </select>
             </div>
             <h2 className="font-semibold">3. Product Images</h2>
-            <div>
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                className="border rounded-lg p-2"
-              />
-            </div>
+            <ImageUploader onUploadComplete={setImageUrls} maxImages={3} />
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-700 text-white py-3 rounded-lg font-medium hover:bg-blue-800 transition"
+              className="w-full bg-blue-700 text-white py-3 rounded-lg font-medium hover:bg-blue-800 transition disabled:opacity-60"
             >
               {loading ? "Posting..." : "Post Listing"}
             </button>

@@ -1,38 +1,31 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ProductCard from "../../components/ProductCard";
+import { getWishlist, removeFromWishlist } from "../../services/api";
+
 const Wishlist = () => {
-  const [wishlistItems, setWishlistItems] = useState([
-    {
-      _id: 1,
-      title: "Engineering Graphics Book",
-      price: "₹300",
-      category: "Books",
-      description:
-        "Almost new condition. Used for one semester and contains no markings.",
-      seller: "Priya Das",
-      images: [
-        "https://via.placeholder.com/600x400?text=Book+1",
-        "https://via.placeholder.com/600x400?text=Book+2",
-      ],
-    },
-    {
-      _id: 2,
-      title: "Calculator",
-      price: "₹500",
-      category: "Stationery",
-      description:
-        "Scientific calculator in excellent condition. Suitable for engineering and mathematics courses.",
-      seller: "Rahul Sharma",
-      images: [
-        "https://via.placeholder.com/600x400?text=Calculator+1",
-        "https://via.placeholder.com/600x400?text=Calculator+2",
-      ],
-    },
-  ]);
-  const removeFromWishlistHandler = (id) => {
-    setWishlistItems(wishlistItems.filter((item) => item._id !== id));
+  const [wishlistItems, setWishlistItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    getWishlist()
+      .then(({ data }) => setWishlistItems(data))
+      .catch((err) => setError(err.response?.data?.message || "Failed to load wishlist"))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const removeFromWishlistHandler = async (id) => {
+    try {
+      await removeFromWishlist(id);
+      setWishlistItems((prev) => prev.filter((item) => item._id !== id));
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to remove from wishlist");
+    }
   };
+
+  if (loading) return <div className="p-8 text-slate-500">Loading...</div>;
+
   if (wishlistItems.length === 0) {
     return (
       <>
@@ -48,10 +41,11 @@ const Wishlist = () => {
     <>
       <div className="max-w-6xl mx-auto px-4 py-8">
         <h1 className=" text-blue-700 font-bold text-3xl mb-6">My Wishlist</h1>
+        {error && <p className="text-red-600 mb-4">{error}</p>}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {wishlistItems.map((item) => (
-            <ProductCard product={item}>
+            <ProductCard key={item._id} product={item}>
               <div className="flex gap-2 mt-4">
                 <button
                   onClick={() => removeFromWishlistHandler(item._id)}

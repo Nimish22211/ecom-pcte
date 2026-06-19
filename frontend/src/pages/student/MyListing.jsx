@@ -1,38 +1,44 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { getMyListings, markProductAsSold, deleteProduct } from "../../services/api";
 
 const MyListing = () => {
-  const [listings, setListings] = useState([
-    {
-      _id: 1,
-      title: "Engineering Graphics Book",
-      price: 300,
-      image: "https://via.placeholder.com/300x200",
-      status: "available",
-    },
-    {
-      _id: 2,
-      title: "Calculator",
-      price: 500,
-      image: "https://via.placeholder.com/300x200",
-      status: "sold",
-    },
-  ]);
-  const markAsSold = (id) => {
-    setListings(
-      listings.map((item) =>
-        item._id === id ? { ...item, status: "sold" } : item,
-      ),
-    );
+  const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    getMyListings()
+      .then(({ data }) => setListings(data))
+      .catch((err) => setError(err.response?.data?.message || "Failed to load listings"))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const markAsSold = async (id) => {
+    try {
+      await markProductAsSold(id);
+      setListings((prev) =>
+        prev.map((item) => (item._id === id ? { ...item, status: "sold" } : item))
+      );
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to mark as sold");
+    }
   };
-  const deleteListing = (id) => {
+
+  const deleteListing = async (id) => {
     const confirmed = window.confirm(
       "Are you sure you want to delete this listing?",
     );
-
     if (!confirmed) return;
-    setListings(listings.filter((item) => item._id !== id));
+    try {
+      await deleteProduct(id);
+      setListings((prev) => prev.filter((item) => item._id !== id));
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to delete listing");
+    }
   };
+
+  if (loading) return <div className="p-8 text-slate-500">Loading...</div>;
+
   if (listings.length === 0) {
     return (
       <>
@@ -46,9 +52,10 @@ const MyListing = () => {
     );
   }
   return (
-    <>  
+    <>
       <div className="max-w-6xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6 text-blue-700">My Listings</h1>
+        {error && <p className="text-red-600 mb-4">{error}</p>}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {listings.map((item) => (
             <div
@@ -56,7 +63,7 @@ const MyListing = () => {
               className="bg-white rounded-2xl shadow-sm border border-slate-200 p-4"
             >
               <img
-                src={item.image}
+                src={item.images?.[0] || "https://via.placeholder.com/300x200"}
                 alt={item.title}
                 className="w-full h-48 object-cover rounded-lg"
               />

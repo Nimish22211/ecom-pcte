@@ -1,29 +1,24 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getMySoldItems } from "../../services/api";
+
 const Dashboard = () => {
-  const [solditems, setSolditems] = useState([
-    {
-      _id: "1",
-      title: "Calculator",
-      price: 500,
-      image: "image-url",
-      status: "sold",
-      soldAt: "2026-06-17T08:30:00.000Z",
-    },
-    {
-      _id: "2",
-      title: "Engineering Graphics Book",
-      price: 300,
-      image: "image-url",
-      status: "sold",
-      soldAt: "2026-06-15T10:20:00.000Z",
-    },
-  ]);
-  const total = solditems.reduce((sum, item) => {
-    return sum + item.price;
-  }, 0);
+  const [solditems, setSolditems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    getMySoldItems()
+      .then(({ data }) => setSolditems(data))
+      .catch((err) => setError(err.response?.data?.message || "Failed to load sold items"))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const total = solditems.reduce((sum, item) => sum + item.price, 0);
+
+  if (loading) return <div className="p-8 text-slate-500">Loading...</div>;
+
+  if (error) return <div className="p-8 text-red-600">{error}</div>;
 
   if (solditems.length === 0) {
     return (
@@ -67,7 +62,7 @@ const Dashboard = () => {
                 className="bg-white border border-slate-200 rounded-xl p-4 flex items-center gap-4"
               >
                 <img
-                  src="https://via.placeholder.com/100"
+                  src={item.images?.[0] || "https://via.placeholder.com/100"}
                   alt={item.title}
                   className="w-20 h-20 rounded-lg object-cover"
                 />
@@ -78,7 +73,7 @@ const Dashboard = () => {
                   <p className="text-green-600 font-medium">₹{item.price}</p>
 
                   <p className="text-sm text-slate-500">
-                    Sold on {new Date(item.soldAt).toLocaleDateString()}
+                    Sold on {new Date(item.createdAt).toLocaleDateString()}
                   </p>
                 </div>
               </div>
