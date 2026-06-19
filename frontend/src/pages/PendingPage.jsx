@@ -1,7 +1,6 @@
 import React from "react";
 import { FaClock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
 
 function PendingPage() {
   const navigate = useNavigate();
@@ -11,7 +10,6 @@ function PendingPage() {
   };
   return (
     <>
-    <Navbar type ="guest"></Navbar>
       <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-300 to-slate-100">
         <FaClock className="text-yellow-500 text-6xl mb-4" />
         <h1 className="text-4xl font-bold text-blue-700 text-center">
