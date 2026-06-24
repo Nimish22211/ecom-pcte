@@ -70,8 +70,10 @@ const ProductDetailPage = () => {
   };
 
   const handleChat = () => {
-    const roomId = `${user._id}_${product._id}`;
-    navigate("/student/chats", { state: { roomId, productId: product._id, sellerName } });
+    // One room per pair of people — independent of product, sorted so it's
+    // the same roomId no matter who's buying/selling or who opens it first.
+    const roomId = [user._id, sellerId].sort().join("_");
+    navigate("/student/chats", { state: { roomId, otherUserName: sellerName } });
   };
 
   return (

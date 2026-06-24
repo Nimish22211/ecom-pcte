@@ -60,6 +60,7 @@ export const addToCart = (productId) => api.post(`/cart/${productId}`);
 export const removeFromCart = (productId) => api.delete(`/cart/${productId}`);
 
 // Chat
+export const getConversations = () => api.get('/chat/conversations');
 export const getChatHistory = (roomId) => api.get(`/chat/${roomId}`);
 
 export default api;
