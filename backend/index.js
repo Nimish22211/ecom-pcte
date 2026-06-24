@@ -5,6 +5,7 @@ import { Server } from 'socket.io';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import chatHandler from './socket/chatHandler.js';
+import { authenticateSocket } from './middleware/authenticateSocket.js';
 import authRoutes from './routes/auth.js';
 import collegeRoutes from './routes/college.js';
 import deanRoutes from './routes/dean.js';
@@ -32,8 +33,11 @@ app.use('/api/chat', chatRoutes);
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
+io.use(authenticateSocket);
+
 io.on('connection', (socket) => {
-  console.log('Socket connected:', socket.id);
+  console.log('Socket connected:', socket.id, '-', socket.user.name);
+  socket.join(String(socket.user._id));
   chatHandler(io, socket);
 });
 
