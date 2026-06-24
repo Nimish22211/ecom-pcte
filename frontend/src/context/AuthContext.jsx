@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../firebase';
+import socket from '../socket';
 
 const AuthContext = createContext(null);
 
@@ -25,6 +26,16 @@ export const AuthProvider = ({ children }) => {
 
     return unsubscribe;
   }, []);
+
+  // Keep the socket connection in sync with login state. Runs on mount too,
+  // so a page refresh while logged in reconnects automatically.
+  useEffect(() => {
+    if (user) {
+      socket.connect();
+    } else {
+      socket.disconnect();
+    }
+  }, [user]);
 
   // Call after a successful /api/auth/*/login response.
   const login = (userData, token) => {
