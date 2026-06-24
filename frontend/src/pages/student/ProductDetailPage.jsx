@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   getProductById,
   addToCart,
+  getCart,
   getWishlist,
   addToWishlist,
   removeFromWishlist,
@@ -19,15 +20,19 @@ const ProductDetailPage = () => {
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [wishlisted, setWishlisted] = useState(false);
+  const [inCart, setInCart] = useState(false);
   const [actionMessage, setActionMessage] = useState("");
 
   useEffect(() => {
     setLoading(true);
-    Promise.all([getProductById(id), getWishlist()])
-      .then(([productRes, wishlistRes]) => {
+    Promise.all([getProductById(id), getWishlist(), getCart()])
+      .then(([productRes, wishlistRes, cartRes]) => {
         setProduct(productRes.data);
         setSelectedImage(productRes.data.images?.[0] || "https://via.placeholder.com/600x400");
         setWishlisted(wishlistRes.data.some((p) => p._id === id));
+        setInCart(
+          cartRes.data.some((item) => (item.productId?._id || item.productId) === id)
+        );
       })
       .catch((err) => setError(err.response?.data?.message || "Failed to load product"))
       .finally(() => setLoading(false));
@@ -47,8 +52,10 @@ const ProductDetailPage = () => {
   const isSeller = sellerId === user?._id;
 
   const handleAddToCart = async () => {
+    if (inCart) return;
     try {
       await addToCart(product._id);
+      setInCart(true);
       setActionMessage("Added to cart");
     } catch (err) {
       setActionMessage(err.response?.data?.message || "Failed to add to cart");
@@ -127,10 +134,14 @@ const ProductDetailPage = () => {
           <div className="flex gap-4 mt-8">
             <button
               onClick={handleAddToCart}
-              disabled={product.status === "sold"}
+              disabled={product.status === "sold" || inCart}
               className="bg-blue-700 text-white px-4 py-2 rounded-lg disabled:opacity-50"
             >
-              {product.status === "sold" ? "Sold Out" : "Add to Cart"}
+              {product.status === "sold"
+                ? "Sold Out"
+                : inCart
+                ? "Already in Cart"
+                : "Add to Cart"}
             </button>
 
             <button

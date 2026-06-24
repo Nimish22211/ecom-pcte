@@ -45,6 +45,7 @@ export const getProducts = (category) => api.get('/products', { params: category
 export const getProductById = (id) => api.get(`/products/${id}`);
 export const createListing = (data) => api.post('/products', data);
 export const markProductAsSold = (id) => api.patch(`/products/${id}/sold`);
+export const markProductAsAvailable = (id) => api.patch(`/products/${id}/available`);
 export const deleteProduct = (id) => api.delete(`/products/${id}`);
 export const getMyListings = () => api.get('/products/my/listings');
 export const getMySoldItems = () => api.get('/products/my/sold');
