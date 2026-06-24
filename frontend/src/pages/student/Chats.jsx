@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import socket from "../../socket";
 import { getChatHistory, getConversations } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
+import Loader from "../../components/Loader";
 
 const Chats = () => {
   const { state } = useLocation();
@@ -93,52 +94,74 @@ const Chats = () => {
   };
 
   return (
-    <div className="flex h-[calc(100vh-100px)] max-w-6xl mx-auto border border-slate-200 rounded-2xl overflow-hidden bg-white">
+    <div className="mx-auto flex h-[calc(100vh-100px)] max-w-6xl overflow-hidden rounded-2xl border border-slate-200 bg-white">
       {/* Conversation list */}
-      <div className="w-72 shrink-0 border-r border-slate-200 overflow-y-auto">
-        <h2 className="px-4 py-3 font-bold text-slate-800 border-b border-slate-100">Chats</h2>
-        {loadingConversations && <p className="p-4 text-sm text-slate-500">Loading...</p>}
+      <div
+        className={`w-full shrink-0 overflow-y-auto border-r border-slate-200 sm:w-72 ${
+          activeRoom?.roomId ? "hidden sm:block" : "block"
+        }`}
+      >
+        <h2 className="border-b border-slate-100 px-4 py-3 font-bold text-slate-800">Chats</h2>
+        {loadingConversations && <Loader />}
         {!loadingConversations && conversations.length === 0 && (
           <p className="p-4 text-sm text-slate-500">No conversations yet.</p>
         )}
         {conversations.map((c) => (
           <button
             key={c.roomId}
+            type="button"
             onClick={() => openConversation(c)}
-            className={`w-full text-left px-4 py-3 border-b border-slate-100 hover:bg-slate-50 transition-colors ${
-              activeRoom?.roomId === c.roomId ? "bg-blue-50" : ""
+            aria-current={activeRoom?.roomId === c.roomId}
+            className={`w-full border-b border-slate-100 px-4 py-3 text-left transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
+              activeRoom?.roomId === c.roomId ? "bg-primary-50" : ""
             }`}
           >
-            <p className="font-medium text-slate-800 truncate">{c.otherUser?.name || "User"}</p>
-            <p className="text-sm text-slate-600 truncate mt-0.5">{c.lastMessage}</p>
+            <p className="truncate font-medium text-slate-800">{c.otherUser?.name || "User"}</p>
+            <p className="mt-0.5 truncate text-sm text-slate-500">{c.lastMessage}</p>
           </button>
         ))}
       </div>
 
       {/* Active thread */}
-      <div className="flex-1 flex flex-col px-4 py-4 min-w-0">
+      <div
+        className={`flex min-w-0 flex-1 flex-col px-4 py-4 ${
+          activeRoom?.roomId ? "flex" : "hidden sm:flex"
+        }`}
+      >
         {!activeRoom?.roomId ? (
-          <div className="flex-1 flex items-center justify-center text-slate-500 text-center px-6">
+          <div className="flex flex-1 items-center justify-center px-6 text-center text-slate-500">
             Select a conversation, or open a product and tap "Chat with Seller".
           </div>
         ) : (
           <>
-            <h1 className="text-xl font-bold text-blue-700 mb-4 truncate">
-              Chat with {activeRoom.otherUserName}
-            </h1>
+            <div className="mb-4 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setActiveRoom(null)}
+                aria-label="Back to conversations"
+                className="rounded-md p-1 text-slate-500 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 sm:hidden"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <h1 className="truncate text-xl font-bold text-primary-700">
+                Chat with {activeRoom.otherUserName}
+              </h1>
+            </div>
 
-            <div className="flex-1 overflow-y-auto bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
-              {loadingMessages && <p className="text-slate-500">Loading messages...</p>}
+            <div className="flex-1 space-y-3 overflow-y-auto rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              {loadingMessages && <Loader />}
               {!loadingMessages && messages.length === 0 && (
                 <p className="text-slate-500">No messages yet. Say hi!</p>
               )}
               {messages.map((msg, i) => (
                 <div
                   key={msg._id || i}
-                  className={`max-w-xs px-4 py-2 rounded-2xl text-sm ${
+                  className={`max-w-xs rounded-2xl px-4 py-2 text-sm ${
                     String(msg.senderId) === String(user._id)
-                      ? "bg-blue-700 text-white ml-auto"
-                      : "bg-white text-slate-900 border border-slate-200"
+                      ? "ml-auto bg-primary-700 text-white"
+                      : "border border-slate-200 bg-white text-slate-900"
                   }`}
                 >
                   {msg.text}
@@ -147,17 +170,22 @@ const Chats = () => {
               <div ref={bottomRef} />
             </div>
 
-            <form onSubmit={handleSend} className="flex gap-2 mt-4">
+            <form onSubmit={handleSend} className="mt-4 flex gap-2">
+              <label htmlFor="chat-message" className="sr-only">
+                Message
+              </label>
               <input
+                id="chat-message"
                 type="text"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder="Type a message..."
-                className="flex-1 border border-slate-200 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 rounded-lg border border-slate-300 px-4 py-2 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30"
               />
               <button
                 type="submit"
-                className="bg-blue-700 text-white px-6 py-2 rounded-lg hover:bg-blue-800 transition-colors"
+                disabled={!text.trim()}
+                className="rounded-lg bg-primary-700 px-6 py-2 font-medium text-white transition-colors hover:bg-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Send
               </button>

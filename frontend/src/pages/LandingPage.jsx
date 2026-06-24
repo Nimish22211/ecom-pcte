@@ -12,6 +12,8 @@ import {
   FaBolt,
   FaHeart,
   FaShoppingBag,
+  FaCalculator,
+  FaComment,
 } from "react-icons/fa";
 import Reveal from "../components/Reveal";
 
@@ -42,17 +44,18 @@ const STEPS = [
   },
 ];
 
-function MockListingCard({ title, price, tag, tilt, top, left, delay }) {
+function MockListingCard({ title, price, icon, label, tilt, top, left, delay }) {
   return (
     <div
       style={{ "--tilt": tilt, top, left, animationDelay: delay }}
       className="absolute w-44 sm:w-48 rounded-2xl bg-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.18)] border border-slate-100 p-3 animate-float"
     >
-      <div className="h-20 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-slate-400 text-xs">
-        {tag}
+      <div className="h-20 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex flex-col items-center justify-center gap-1 text-slate-400">
+        <span className="text-lg">{icon}</span>
+        <span className="text-xs">{label}</span>
       </div>
       <p className="text-sm font-semibold text-slate-900 mt-2 truncate">{title}</p>
-      <p className="text-indigo-600 font-bold text-sm">₹{price}</p>
+      <p className="text-primary-700 font-bold text-sm">₹{price}</p>
     </div>
   );
 }
@@ -84,7 +87,7 @@ function LandingPage() {
       {/* Hero */}
       <section className="relative pt-40 pb-28 px-6 max-w-6xl mx-auto">
         {/* gradient blobs */}
-        <div className="absolute -top-20 -left-32 w-96 h-96 bg-indigo-200/40 rounded-full blur-3xl animate-blob -z-10" />
+        <div className="absolute -top-20 -left-32 w-96 h-96 bg-primary-200/40 rounded-full blur-3xl animate-blob -z-10" />
         <div className="absolute top-10 right-0 w-80 h-80 bg-emerald-200/30 rounded-full blur-3xl animate-blob -z-10" style={{ animationDelay: "3s" }} />
 
         <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -102,7 +105,7 @@ function LandingPage() {
                 campus
                 <svg
                   viewBox="0 0 200 12"
-                  className="absolute left-0 -bottom-1 w-full h-3 text-indigo-300"
+                  className="absolute left-0 -bottom-1 w-full h-3 text-primary-300"
                   preserveAspectRatio="none"
                 >
                   <path
@@ -149,7 +152,8 @@ function LandingPage() {
             <MockListingCard
               title="Engineering Graphics"
               price="300"
-              tag="📘 Books"
+              icon={<FaBookOpen />}
+              label="Books"
               tilt="-6deg"
               top="10px"
               left="20px"
@@ -158,7 +162,8 @@ function LandingPage() {
             <MockListingCard
               title="Scientific Calculator"
               price="500"
-              tag="🔢 Stationery"
+              icon={<FaCalculator />}
+              label="Stationery"
               tilt="4deg"
               top="120px"
               left="190px"
@@ -167,7 +172,8 @@ function LandingPage() {
             <MockListingCard
               title="HP Laptop, 8GB"
               price="25000"
-              tag="💻 Electronics"
+              icon={<FaLaptop />}
+              label="Electronics"
               tilt="-3deg"
               top="250px"
               left="40px"
@@ -186,8 +192,9 @@ function LandingPage() {
               className="absolute bottom-4 right-8 bg-white rounded-2xl px-4 py-2.5 shadow-lg border border-slate-100 flex items-center gap-2 animate-float"
               style={{ "--tilt": "-2deg", animationDelay: "0.9s" }}
             >
-              <span className="text-xs font-medium text-slate-600">
-                💬 "Still available?"
+              <span className="flex items-center gap-1.5 text-xs font-medium text-slate-600">
+                <FaComment className="text-primary-600" aria-hidden="true" />
+                "Still available?"
               </span>
             </div>
           </div>
@@ -212,7 +219,7 @@ function LandingPage() {
       {/* How it works */}
       <section className="max-w-6xl mx-auto px-6 py-24">
         <Reveal>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 mb-3">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-primary-700 mb-3">
             How it works
           </h2>
         </Reveal>
@@ -245,7 +252,7 @@ function LandingPage() {
       {/* Bento capabilities */}
       <section className="max-w-6xl mx-auto px-6 py-12">
         <Reveal>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-indigo-600 mb-3">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-primary-700 mb-3">
             Built differently
           </h2>
         </Reveal>
@@ -335,7 +342,7 @@ function LandingPage() {
                 key={`${cat.label}-${i}`}
                 className="flex items-center gap-3 mx-4 px-6 py-3 rounded-full border border-slate-200 bg-white shrink-0"
               >
-                <span className="text-indigo-600">{cat.icon}</span>
+                <span className="text-primary-700">{cat.icon}</span>
                 <span className="text-sm font-medium text-slate-700 whitespace-nowrap">
                   {cat.label}
                 </span>

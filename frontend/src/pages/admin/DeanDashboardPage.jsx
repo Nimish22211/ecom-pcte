@@ -32,62 +32,99 @@ const DeanDashboardPage = () => {
     }
   };
 
-  return (
-    <>
-      <Navbar type="dean" />
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-blue-700 mb-6">Dean Dashboard</h1>
+  const inputClasses =
+    "w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-slate-900 placeholder:text-slate-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30";
 
-        {loading && <p className="text-slate-500">Loading...</p>}
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <Navbar type="dean" />
+      <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+        <h1 className="text-3xl font-bold text-slate-900">Dean Dashboard</h1>
+
+        {loading && (
+          <div className="mt-6 flex items-center gap-3 text-slate-500">
+            <div
+              className="h-5 w-5 animate-spin rounded-full border-2 border-primary-600 border-t-transparent"
+              aria-hidden="true"
+            />
+            Loading...
+          </div>
+        )}
 
         {!loading && error && !college && (
-          <p className="text-red-600 mb-4">{error}</p>
+          <p role="alert" className="mt-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">
+            {error}
+          </p>
         )}
 
         {!loading && college && (
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+          <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
             <h2 className="text-xl font-semibold text-slate-900">{college.name}</h2>
-            <p className="text-slate-500 mt-1">{college.city}</p>
-            <p className="text-blue-700 font-mono mt-2">{college.emailDomain}</p>
+            <p className="mt-1 text-slate-500">{college.city}</p>
+            <p className="mt-2 font-mono text-primary-700">{college.emailDomain}</p>
           </div>
         )}
 
         {!loading && !college && (
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <h2 className="text-xl font-semibold mb-4">Create your college profile</h2>
-            <p className="text-slate-500 mb-4">
+          <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-card">
+            <h2 className="mb-1 text-xl font-semibold text-slate-900">
+              Create your college profile
+            </h2>
+            <p className="mb-4 text-sm text-slate-500">
               You can only create one college profile, and it cannot be changed afterward.
             </p>
-            {error && <p className="text-red-600 mb-4">{error}</p>}
-            <form className="flex flex-col gap-4" onSubmit={handleCreateCollege}>
-              <input
-                type="text"
-                placeholder="College name"
-                className="border rounded-lg px-4 py-2"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-              <input
-                type="text"
-                placeholder="Email domain (e.g. @mitcollege.edu.in)"
-                className="border rounded-lg px-4 py-2"
-                value={emailDomain}
-                onChange={(e) => setEmailDomain(e.target.value)}
-                required
-              />
-              <input
-                type="text"
-                placeholder="City"
-                className="border rounded-lg px-4 py-2"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                required
-              />
+            {error && (
+              <p role="alert" className="mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">
+                {error}
+              </p>
+            )}
+            <form className="flex flex-col gap-4" onSubmit={handleCreateCollege} noValidate>
+              <div>
+                <label htmlFor="college-name" className="mb-1.5 block text-sm font-medium text-slate-700">
+                  College name
+                </label>
+                <input
+                  id="college-name"
+                  type="text"
+                  placeholder="e.g. MIT College of Engineering"
+                  className={inputClasses}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="college-domain" className="mb-1.5 block text-sm font-medium text-slate-700">
+                  Email domain
+                </label>
+                <input
+                  id="college-domain"
+                  type="text"
+                  placeholder="e.g. @mitcollege.edu.in"
+                  className={inputClasses}
+                  value={emailDomain}
+                  onChange={(e) => setEmailDomain(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="college-city" className="mb-1.5 block text-sm font-medium text-slate-700">
+                  City
+                </label>
+                <input
+                  id="college-city"
+                  type="text"
+                  placeholder="e.g. Pune"
+                  className={inputClasses}
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  required
+                />
+              </div>
               <button
                 type="submit"
                 disabled={submitting}
-                className="bg-blue-700 text-white py-2 rounded-lg hover:bg-blue-800 disabled:opacity-60"
+                className="mt-2 rounded-lg bg-primary-700 py-2.5 font-medium text-white transition-colors hover:bg-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {submitting ? "Creating..." : "Create College"}
               </button>
@@ -95,7 +132,7 @@ const DeanDashboardPage = () => {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 };
 

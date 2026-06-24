@@ -1,10 +1,12 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase";
 import { getColleges, studentRegister } from "../services/api";
+
+const inputClasses =
+  "w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-slate-900 placeholder:text-slate-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30";
+const labelClasses = "mb-1.5 block text-sm font-medium text-slate-700";
 
 function RegisterPage() {
   const [name, setName] = useState("");
@@ -43,92 +45,116 @@ function RegisterPage() {
   };
 
   return (
-    <>
-      <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-200 to-slate-100">
-        <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
-          <h1 className="text-3xl font-bold text-blue-700 text-center">
-            CampusCart
-          </h1>
-          <p className="text-center text-slate-500 mt-2 mb-6">
-            Create your student account
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary-50 via-white to-slate-50 px-4 py-10">
+      <div className="w-full max-w-md animate-fade-up rounded-2xl border border-slate-200/80 bg-white p-8 shadow-card">
+        <h1 className="text-center text-3xl font-bold text-primary-800">CampusCart</h1>
+        <p className="mt-2 mb-6 text-center text-slate-500">Create your student account</p>
+
+        {error && (
+          <p
+            role="alert"
+            className="mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700"
+          >
+            {error}
           </p>
-          {error && (
-            <p className="bg-red-50 text-red-700 text-sm rounded-lg px-4 py-2 mb-4">
-              {error}
-            </p>
-          )}
-          <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-            <div className="flex flex-col">
-              <input
-                type="text"
-                placeholder="Enter your full name"
-                className="border rounded-lg px-4 py-2 bg-slate-50"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
-            <div className="flex flex-col">
-              <input
-                type="text"
-                placeholder="Enter university roll number"
-                className="border rounded-lg px-4 py-2 bg-slate-50"
-                value={rollNumber}
-                onChange={(e) => setRollNumber(e.target.value)}
-                required
-              />
-            </div>
-            <div className="flex flex-col">
-              <input
-                type="email"
-                placeholder="Enter your college E-mail ID "
-                className="border rounded-lg px-4 py-2 bg-slate-50"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div className="flex flex-col">
-              <input
-                type="password"
-                placeholder="Enter your password"
-                className="border rounded-lg px-4 py-2 bg-slate-50"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-              />
-            </div>
+        )}
+
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
+          <div>
+            <label htmlFor="reg-name" className={labelClasses}>
+              Full name
+            </label>
+            <input
+              id="reg-name"
+              type="text"
+              autoComplete="name"
+              placeholder="Jordan Smith"
+              className={inputClasses}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="reg-roll" className={labelClasses}>
+              University roll number
+            </label>
+            <input
+              id="reg-roll"
+              type="text"
+              placeholder="e.g. 21CS1042"
+              className={inputClasses}
+              value={rollNumber}
+              onChange={(e) => setRollNumber(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="reg-email" className={labelClasses}>
+              College email
+            </label>
+            <input
+              id="reg-email"
+              type="email"
+              autoComplete="email"
+              placeholder="you@college.edu.in"
+              className={inputClasses}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="reg-password" className={labelClasses}>
+              Password
+            </label>
+            <input
+              id="reg-password"
+              type="password"
+              autoComplete="new-password"
+              placeholder="At least 6 characters"
+              className={inputClasses}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+            />
+          </div>
+          <div>
+            <label htmlFor="reg-college" className={labelClasses}>
+              College
+            </label>
             <select
-              className="border rounded-lg px-4 py-2 bg-slate-50"
+              id="reg-college"
+              className={inputClasses}
               value={collegeId}
               onChange={(e) => setCollegeId(e.target.value)}
               required
             >
-              <option value="">Select College</option>
+              <option value="">Select your college</option>
               {colleges.map((college) => (
                 <option key={college._id} value={college._id}>
                   {college.name}
                 </option>
               ))}
             </select>
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-2 bg-blue-700 text-white py-2 rounded-lg hover:bg-blue-800 disabled:opacity-60"
-            >
-              {loading ? "Creating account..." : "Register"}
-            </button>
-            <p className="text-center mt-4">
-              Already have an account?
-              <Link to="/login" className="text-blue-700 font-medium ml-1">
-                Login
-              </Link>
-            </p>
-          </form>
-        </div>
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="mt-2 rounded-lg bg-primary-700 py-2.5 font-medium text-white transition-colors hover:bg-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading ? "Creating account..." : "Register"}
+          </button>
+          <p className="mt-2 text-center text-sm text-slate-600">
+            Already have an account?{" "}
+            <Link to="/login" className="font-medium text-primary-700 hover:text-primary-800">
+              Login
+            </Link>
+          </p>
+        </form>
       </div>
-    </>
+    </div>
   );
 }
 

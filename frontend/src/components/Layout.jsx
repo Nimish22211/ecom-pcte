@@ -14,6 +14,17 @@ function Layout() {
   const lightTheme = createTheme({
     palette: {
       mode: "light",
+      primary: {
+        main: "#1d39c7",
+        light: "#608bfa",
+        dark: "#162456",
+      },
+      background: {
+        default: "#f8fafc",
+      },
+    },
+    shape: {
+      borderRadius: 10,
     },
   });
   const NAVIGATION = GetNavigation();

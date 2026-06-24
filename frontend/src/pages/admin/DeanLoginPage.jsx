@@ -5,9 +5,13 @@ import { auth } from "../../firebase";
 import { deanLogin } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
+const inputClasses =
+  "w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-slate-900 placeholder:text-slate-400 transition-colors focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/30";
+const labelClasses = "mb-1.5 block text-sm font-medium text-slate-700";
+
 function DeanLoginPage() {
-  const [deanEmail, setdeanEmail] = useState("");
-  const [deanPassword, setdeanPassword] = useState("");
+  const [deanEmail, setDeanEmail] = useState("");
+  const [deanPassword, setDeanPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -33,48 +37,61 @@ function DeanLoginPage() {
   };
 
   return (
-    <>
-      <div className="min-h-screen flex items-center justify-center  bg-gradient-to-br from-blue-200 to-slate-100">
-        <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md">
-          <h1 className="text-3xl font-bold text-blue-700 text-center">
-            CampusCart
-          </h1>
-          <p className="text-center text-slate-500 mt-2 mb-6">
-            Dean/Admin Login
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary-50 via-white to-slate-50 px-4">
+      <div className="w-full max-w-md animate-fade-up rounded-2xl border border-slate-200/80 bg-white p-8 shadow-card">
+        <h1 className="text-center text-3xl font-bold text-primary-800">CampusCart</h1>
+        <p className="mt-2 mb-6 text-center text-slate-500">Dean / Admin login</p>
+
+        {error && (
+          <p
+            role="alert"
+            className="mb-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700"
+          >
+            {error}
           </p>
-          {error && (
-            <p className="bg-red-50 text-red-700 text-sm rounded-lg px-4 py-2 mb-4">
-              {error}
-            </p>
-          )}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+          <div>
+            <label htmlFor="dean-email" className={labelClasses}>
+              Email
+            </label>
             <input
+              id="dean-email"
               type="email"
-              className="border rounded-lg bg-slate-50 py-2 px-4 "
-              placeholder="Enter your E-mail"
+              autoComplete="email"
+              placeholder="dean@college.edu.in"
+              className={inputClasses}
               value={deanEmail}
-              onChange={(e) => setdeanEmail(e.target.value)}
+              onChange={(e) => setDeanEmail(e.target.value)}
               required
             />
+          </div>
+          <div>
+            <label htmlFor="dean-password" className={labelClasses}>
+              Password
+            </label>
             <input
+              id="dean-password"
               type="password"
-              className="border rounded-lg bg-slate-50 py-2 px-4 "
-              placeholder="Enter your password"
+              autoComplete="current-password"
+              placeholder="••••••••"
+              className={inputClasses}
               value={deanPassword}
-              onChange={(e) => setdeanPassword(e.target.value)}
+              onChange={(e) => setDeanPassword(e.target.value)}
               required
             />
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-2 px-4 py-2 text-white bg-blue-500 rounded-lg disabled:opacity-60"
-            >
-              {loading ? "Signing in..." : "Login"}
-            </button>
-          </form>
-        </div>
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="mt-2 rounded-lg bg-primary-700 py-2.5 font-medium text-white transition-colors hover:bg-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading ? "Signing in..." : "Login"}
+          </button>
+        </form>
       </div>
-    </>
+    </div>
   );
 }
 

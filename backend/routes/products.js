@@ -4,6 +4,7 @@ import {
   createProduct,
   getProductById,
   markAsSold,
+  markAsAvailable,
   deleteProduct,
   getMyListings,
   getMySoldItems,
@@ -21,6 +22,7 @@ router.get('/', authenticate, requireVerified, getProducts);
 router.post('/', authenticate, requireVerified, createProduct);
 router.get('/:id', authenticate, requireVerified, getProductById);
 router.patch('/:id/sold', authenticate, requireVerified, markAsSold);
+router.patch('/:id/available', authenticate, requireVerified, markAsAvailable);
 router.delete('/:id', authenticate, requireVerified, deleteProduct);
 
 export default router;
