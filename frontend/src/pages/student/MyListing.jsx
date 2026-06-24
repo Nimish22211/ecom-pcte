@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { getMyListings, markProductAsSold, deleteProduct } from "../../services/api";
+import {
+  getMyListings,
+  markProductAsSold,
+  markProductAsAvailable,
+  deleteProduct,
+} from "../../services/api";
 
 const MyListing = () => {
   const [listings, setListings] = useState([]);
@@ -21,6 +26,17 @@ const MyListing = () => {
       );
     } catch (err) {
       setError(err.response?.data?.message || "Failed to mark as sold");
+    }
+  };
+
+  const markAsAvailable = async (id) => {
+    try {
+      await markProductAsAvailable(id);
+      setListings((prev) =>
+        prev.map((item) => (item._id === id ? { ...item, status: "available" } : item))
+      );
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to mark as available");
     }
   };
 
@@ -79,12 +95,19 @@ const MyListing = () => {
                 {item.status === "available" ? "Available" : "Sold"}
               </span>
               <div className="flex gap-2 mt-4">
-                {item.status === "available" && (
+                {item.status === "available" ? (
                   <button
                     onClick={() => markAsSold(item._id)}
                     className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
                   >
                     Mark as Sold
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => markAsAvailable(item._id)}
+                    className="bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600"
+                  >
+                    Mark as Unsold
                   </button>
                 )}
 

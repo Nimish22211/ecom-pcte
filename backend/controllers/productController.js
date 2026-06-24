@@ -56,6 +56,20 @@ export const markAsSold = async (req, res) => {
   }
 };
 
+export const markAsAvailable = async (req, res) => {
+  try {
+    const product = await Product.findOneAndUpdate(
+      { _id: req.params.id, sellerId: req.user._id },
+      { status: 'available' },
+      { new: true }
+    );
+    if (!product) return res.status(404).json({ message: 'Product not found or unauthorized' });
+    res.json(product);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 export const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findOneAndDelete({ _id: req.params.id, sellerId: req.user._id });
