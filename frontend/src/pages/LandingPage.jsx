@@ -1,29 +1,47 @@
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import {
-  FaBookOpen,
-  FaLaptop,
-  FaStickyNote,
-  FaPencilRuler,
-  FaHome,
-  FaBoxOpen,
-  FaShieldAlt,
-  FaArrowRight,
-  FaCheckCircle,
-  FaBolt,
-  FaHeart,
-  FaShoppingBag,
-  FaCalculator,
-  FaComment,
-} from "react-icons/fa";
+  IconArrowRight,
+  IconStarFilled,
+  IconShieldCheck,
+  IconMessageCircle,
+  IconBolt,
+  IconChevronDown,
+  IconCheck,
+  IconBook,
+  IconDeviceLaptop,
+  IconArmchair,
+} from "@tabler/icons-react";
 import Reveal from "../components/Reveal";
 
+const TRUST_ITEMS = [
+  "Dean-verified students only",
+  "Zero shipping, zero scams",
+  "12,000+ campus deals closed",
+  "Chat directly with sellers",
+  "Free to list, free to browse",
+];
+
 const CATEGORIES = [
-  { label: "Books", icon: <FaBookOpen /> },
-  { label: "Electronics", icon: <FaLaptop /> },
-  { label: "Notes", icon: <FaStickyNote /> },
-  { label: "Stationery", icon: <FaPencilRuler /> },
-  { label: "Hostel", icon: <FaHome /> },
-  { label: "Other", icon: <FaBoxOpen /> },
+  {
+    label: "Textbooks & Notes",
+    icon: <IconBook size={22} />,
+  },
+  {
+    label: "Electronics",
+    icon: <IconDeviceLaptop size={22} />,
+  },
+  {
+    label: "Hostel Essentials",
+    icon: <IconArmchair size={22} />,
+  },
+];
+
+const BESTSELLERS = [
+  { title: "Engineering Graphics, 4th Ed.", category: "Books", price: 300, rating: 4.9, reviews: 41 },
+  { title: "Casio FX-991ES Calculator", category: "Stationery", price: 500, rating: 4.8, reviews: 76 },
+  { title: "HP Pavilion, 8GB RAM", category: "Electronics", price: 25000, rating: 4.7, reviews: 18 },
+  { title: "Study Table Lamp", category: "Hostel", price: 350, rating: 4.9, reviews: 23 },
 ];
 
 const STEPS = [
@@ -44,39 +62,55 @@ const STEPS = [
   },
 ];
 
-function MockListingCard({ title, price, icon, label, tilt, top, left, delay }) {
-  return (
-    <div
-      style={{ "--tilt": tilt, top, left, animationDelay: delay }}
-      className="absolute w-44 sm:w-48 rounded-2xl bg-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.18)] border border-slate-100 p-3 animate-float"
-    >
-      <div className="h-20 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex flex-col items-center justify-center gap-1 text-slate-400">
-        <span className="text-lg">{icon}</span>
-        <span className="text-xs">{label}</span>
-      </div>
-      <p className="text-sm font-semibold text-slate-900 mt-2 truncate">{title}</p>
-      <p className="text-primary-700 font-bold text-sm">₹{price}</p>
-    </div>
-  );
+const REVIEWS = [
+  {
+    name: "Ananya R.",
+    text: "Sold my old calculator in two days, no haggling with strangers off campus. The dean verification actually makes it feel safe.",
+  },
+  {
+    name: "Kabir M.",
+    text: "Found a barely-used drafter set for a third of the bookstore price. Chatted with the seller, met at the canteen, done.",
+  },
+  {
+    name: "Priya S.",
+    text: "Listing took less than a minute. Way better than posting in five different WhatsApp groups and hoping someone replies.",
+  },
+];
+
+function useScrolled(threshold = 40) {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > threshold);
+    onScroll();
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [threshold]);
+  return scrolled;
 }
 
 function LandingPage() {
+  const scrolled = useScrolled();
+
   return (
-    <div className="min-h-screen bg-white font-sans text-slate-900 antialiased overflow-x-hidden">
+    <div className="min-h-screen bg-bg font-sans text-ink-primary antialiased overflow-x-hidden">
       {/* Nav */}
-      <header className="fixed top-0 inset-x-0 z-30 bg-white/70 backdrop-blur-md border-b border-slate-200/70">
+      <header
+        className={`fixed top-0 inset-x-0 z-40 transition-colors duration-200 ${
+          scrolled ? "border-b border-border bg-white/95 backdrop-blur-md" : "border-b border-transparent bg-transparent"
+        }`}
+      >
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <span className="text-lg font-bold tracking-tight">CampusCart</span>
+          <span className="text-lg font-bold tracking-[-0.02em] text-ink-primary">CampusCart</span>
           <nav className="flex items-center gap-6">
             <Link
               to="/login"
-              className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+              className="text-sm font-medium text-ink-secondary hover:text-ink-primary transition-colors"
             >
               Login
             </Link>
             <Link
               to="/register"
-              className="text-sm font-medium bg-slate-900 text-white px-4 py-2 rounded-full hover:bg-slate-700 transition-colors"
+              className="h-10 flex items-center text-sm font-medium bg-accent text-accent-fg px-4 rounded-full hover:bg-accent-hover transition-colors"
             >
               Register
             </Link>
@@ -85,307 +119,366 @@ function LandingPage() {
       </header>
 
       {/* Hero */}
-      <section className="relative pt-40 pb-28 px-6 max-w-6xl mx-auto">
-        {/* gradient blobs */}
-        <div className="absolute -top-20 -left-32 w-96 h-96 bg-primary-200/40 rounded-full blur-3xl animate-blob -z-10" />
-        <div className="absolute top-10 right-0 w-80 h-80 bg-emerald-200/30 rounded-full blur-3xl animate-blob -z-10" style={{ animationDelay: "3s" }} />
-
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+      <section className="relative min-h-screen flex items-center px-6 pt-24 pb-16 max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-[60%_40%] gap-16 items-center w-full">
           {/* Left: copy */}
           <div>
-            <span className="inline-flex items-center gap-2 text-xs font-medium text-slate-500 border border-slate-200 rounded-full px-3 py-1.5 mb-8">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              Verified by your dean — not the internet
-            </span>
-            <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight leading-[1.05]">
+            <div className="flex items-center gap-2 mb-6">
+              <span className="inline-block h-3.5 w-0.5 bg-ink-primary" aria-hidden="true" />
+              <span className="text-[12px] font-medium uppercase tracking-[0.08em] text-ink-secondary">
+                Dean-verified marketplace
+              </span>
+            </div>
+            <h1 className="text-[40px] sm:text-display font-bold tracking-[-0.03em] leading-[1.05]">
               The marketplace
               <br />
-              made for your{" "}
-              <span className="relative inline-block">
-                campus
-                <svg
-                  viewBox="0 0 200 12"
-                  className="absolute left-0 -bottom-1 w-full h-3 text-primary-300"
-                  preserveAspectRatio="none"
-                >
-                  <path
-                    d="M2 9 C 60 2, 140 2, 198 9"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    fill="none"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </span>
-              .
+              made for your
+              <br />
+              <span className="font-normal italic">own campus.</span>
             </h1>
-            <p className="text-lg text-slate-500 mt-6 max-w-md leading-relaxed">
-              No strangers, no scams, no shipping. Just verified students at
-              your college, buying and selling textbooks, electronics, and
-              hostel essentials directly with each other.
+            <p className="text-[18px] text-ink-secondary mt-6 max-w-[440px] leading-[1.6]">
+              No strangers, no scams, no shipping. Just verified students at your
+              college, buying and selling textbooks, electronics, and hostel
+              essentials directly with each other.
             </p>
-            <div className="flex flex-wrap gap-3 mt-10">
+            <div className="flex flex-wrap items-center gap-3 mt-10">
               <Link
                 to="/register"
-                className="group inline-flex items-center gap-2 bg-slate-900 text-white px-7 py-3.5 rounded-full font-medium text-sm hover:bg-slate-700 transition-colors"
+                className="group inline-flex items-center gap-2 h-11 bg-accent text-accent-fg px-6 rounded-full font-medium text-sm hover:bg-accent-hover transition-colors"
               >
-                Get started
-                <FaArrowRight className="text-xs transition-transform group-hover:translate-x-1" />
+                Shop Now
+                <IconArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
               </Link>
               <Link
                 to="/login"
-                className="inline-flex items-center px-7 py-3.5 rounded-full font-medium text-sm border border-slate-300 hover:border-slate-400 hover:bg-slate-50 transition-colors"
+                className="inline-flex items-center h-11 px-6 rounded-full font-medium text-sm text-ink-primary hover:bg-[#F0F0F0] transition-colors"
               >
                 I already have an account
               </Link>
             </div>
+
+            <div className="flex items-center gap-3 mt-10">
+              <div className="flex -space-x-2">
+                {["AR", "KM", "PS", "SJ", "RV"].map((initials) => (
+                  <span
+                    key={initials}
+                    className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-[#E5E5E5] text-[10px] font-semibold text-ink-secondary"
+                  >
+                    {initials}
+                  </span>
+                ))}
+              </div>
+              <p className="text-sm text-ink-secondary">
+                Trusted by 12,000+ students{" "}
+                <span className="inline-flex items-center gap-0.5 font-medium text-ink-primary">
+                  4.9 <IconStarFilled size={12} className="text-amber-400" />
+                </span>
+              </p>
+            </div>
+
             <Link
               to="/admin/login"
-              className="inline-block text-sm text-slate-400 hover:text-slate-600 transition-colors mt-8"
+              className="inline-block text-sm text-ink-muted hover:text-ink-secondary transition-colors mt-8"
             >
               Dean / Admin login →
             </Link>
           </div>
 
-          {/* Right: floating bento visual */}
-          <div className="relative h-[420px] hidden lg:block">
-            <MockListingCard
-              title="Engineering Graphics"
-              price="300"
-              icon={<FaBookOpen />}
-              label="Books"
-              tilt="-6deg"
-              top="10px"
-              left="20px"
-              delay="0s"
-            />
-            <MockListingCard
-              title="Scientific Calculator"
-              price="500"
-              icon={<FaCalculator />}
-              label="Stationery"
-              tilt="4deg"
-              top="120px"
-              left="190px"
-              delay="0.6s"
-            />
-            <MockListingCard
-              title="HP Laptop, 8GB"
-              price="25000"
-              icon={<FaLaptop />}
-              label="Electronics"
-              tilt="-3deg"
-              top="250px"
-              left="40px"
-              delay="1.2s"
-            />
+          {/* Right: image card */}
+          <div className="relative hidden lg:block">
+            <div className="relative aspect-[4/5] rounded-[28px] bg-[#F5F5F5] overflow-hidden flex items-center justify-center">
+              <IconDeviceLaptop size={96} className="text-[#CBCBCB]" />
 
-            <div
-              className="absolute top-0 right-2 bg-slate-900 text-white rounded-2xl px-4 py-3 shadow-xl flex items-center gap-2 animate-float"
-              style={{ "--tilt": "2deg", animationDelay: "0.3s" }}
-            >
-              <FaCheckCircle className="text-emerald-400" />
-              <span className="text-xs font-medium">Verified by Dr. Sharma</span>
-            </div>
+              <div
+                className="absolute top-4 right-4 flex items-center gap-1.5 rounded-pill bg-success/10 px-3 py-1.5 text-[12px] font-medium text-success"
+                style={{ animation: "fade-up 0.5s ease-out 0.1s both" }}
+              >
+                <IconCheck size={14} />
+                In Stock
+              </div>
 
-            <div
-              className="absolute bottom-4 right-8 bg-white rounded-2xl px-4 py-2.5 shadow-lg border border-slate-100 flex items-center gap-2 animate-float"
-              style={{ "--tilt": "-2deg", animationDelay: "0.9s" }}
-            >
-              <span className="flex items-center gap-1.5 text-xs font-medium text-slate-600">
-                <FaComment className="text-primary-600" aria-hidden="true" />
-                "Still available?"
-              </span>
+              <div
+                className="absolute bottom-4 left-4 right-4 rounded-[28px] bg-white p-4 shadow-card flex items-center justify-between"
+                style={{ animation: "fade-up 0.5s ease-out 0.3s both" }}
+              >
+                <div>
+                  <p className="text-sm font-medium text-ink-primary">HP Pavilion, 8GB RAM</p>
+                  <p className="text-sm font-semibold text-ink-primary mt-0.5">₹25,000</p>
+                </div>
+                <span className="flex h-9 px-3 items-center rounded-pill bg-accent text-accent-fg text-[13px] font-medium">
+                  Add
+                </span>
+              </div>
             </div>
           </div>
         </div>
+
+        <div className="absolute bottom-6 inset-x-0 flex flex-col items-center gap-2 text-ink-muted">
+          <span className="text-[11px] tracking-[0.04em]">Scroll to explore</span>
+          <IconChevronDown size={16} className="animate-chevron-pulse" />
+        </div>
       </section>
 
-      {/* Contrast strip */}
-      <Reveal>
-        <section className="border-y border-slate-100 bg-slate-50">
-          <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-10 text-center">
-            <p className="text-slate-400 text-lg line-through">
-              Open to anyone with an internet connection
-            </p>
-            <FaArrowRight className="text-slate-300 hidden sm:block" />
-            <p className="text-slate-900 text-lg font-semibold">
-              Open only to verified students at your college
-            </p>
-          </div>
-        </section>
-      </Reveal>
+      {/* Trust marquee band */}
+      <section className="bg-[#0A0A0A] overflow-hidden py-3.5">
+        <div className="group flex w-max animate-marquee hover:[animation-play-state:paused]">
+          {[...TRUST_ITEMS, ...TRUST_ITEMS, ...TRUST_ITEMS].map((item, i) => (
+            <span key={i} className="flex items-center text-white">
+              <span className="text-[13px] font-medium tracking-[0.04em] whitespace-nowrap px-4">
+                {item}
+              </span>
+              <span className="text-[#404040]">·</span>
+            </span>
+          ))}
+        </div>
+      </section>
 
-      {/* How it works */}
+      {/* Featured Categories */}
       <section className="max-w-6xl mx-auto px-6 py-24">
-        <Reveal>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-primary-700 mb-3">
-            How it works
-          </h2>
-        </Reveal>
-        <Reveal delay={80}>
-          <p className="text-3xl font-bold tracking-tight max-w-xl mb-16">
-            Three steps between you and a verified campus marketplace.
-          </p>
+        <Reveal className="text-center">
+          <h2 className="text-h2 font-semibold tracking-[-0.015em]">Shop by Category</h2>
+          <p className="text-ink-secondary mt-2">Whatever you need this semester, someone on campus is selling it.</p>
         </Reveal>
 
-        <div className="relative grid sm:grid-cols-3 gap-12">
-          <div className="hidden sm:block absolute top-5 left-0 right-0 h-px bg-slate-200" />
-          {STEPS.map((step, i) => (
-            <Reveal key={step.n} delay={i * 120}>
-              <div className="relative">
-                <div className="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-mono mb-6 relative z-10">
-                  {step.n}
+        <div className="grid sm:grid-cols-3 gap-6 mt-12">
+          {CATEGORIES.map((cat, i) => (
+            <Reveal key={cat.label} delay={i * 80}>
+              <Link
+                to="/login"
+                className="group relative block aspect-[3/4] overflow-hidden rounded-[28px] bg-[#F0F0F0]"
+              >
+                <div className="absolute inset-0 flex items-center justify-center text-[#CBCBCB] transition-transform duration-300 group-hover:scale-105">
+                  <div className="scale-[3.2]">{cat.icon}</div>
                 </div>
-                <h3 className="font-semibold text-lg text-slate-900">
-                  {step.title}
-                </h3>
-                <p className="text-slate-500 mt-2 leading-relaxed text-sm">
-                  {step.desc}
-                </p>
+                <div className="absolute inset-x-0 bottom-0 flex items-center justify-between px-4 py-3.5 bg-white/85 backdrop-blur-sm">
+                  <span className="text-[16px] font-semibold text-ink-primary">{cat.label}</span>
+                  <IconArrowRight size={18} className="text-ink-primary" />
+                </div>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* Bestsellers */}
+      <section className="max-w-6xl mx-auto px-6 py-12">
+        <Reveal className="flex items-end justify-between mb-10">
+          <h2 className="text-h2 font-semibold tracking-[-0.015em]">Recently Listed</h2>
+          <Link to="/login" className="text-sm font-medium text-ink-secondary hover:text-ink-primary transition-colors">
+            View All →
+          </Link>
+        </Reveal>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          {BESTSELLERS.map((item, i) => (
+            <Reveal key={item.title} delay={i * 80}>
+              <div className="group">
+                <div className="relative aspect-square rounded-[28px] bg-[#F5F5F5] overflow-hidden">
+                  <div className="absolute inset-0 flex items-center justify-center text-[#CBCBCB] transition-transform duration-[400ms] group-hover:scale-[1.04]">
+                    <IconBook size={48} />
+                  </div>
+                  <button
+                    type="button"
+                    className="absolute bottom-3 left-1/2 h-[38px] -translate-x-1/2 translate-y-2 rounded-pill bg-white px-5 text-[13px] font-medium text-ink-primary opacity-0 shadow-card transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100"
+                  >
+                    Quick View
+                  </button>
+                </div>
+                <div className="pt-3">
+                  <h3 className="line-clamp-1 text-[15px] font-medium text-ink-primary">{item.title}</h3>
+                  <p className="text-[12px] uppercase tracking-[0.04em] text-ink-muted mt-0.5">{item.category}</p>
+                  <div className="flex items-center justify-between mt-1">
+                    <p className="text-[16px] font-semibold text-ink-primary">₹{item.price.toLocaleString()}</p>
+                    <span className="flex items-center gap-1 text-[12px] text-ink-muted">
+                      <IconStarFilled size={12} className="text-amber-400" />
+                      {item.rating} <span>({item.reviews})</span>
+                    </span>
+                  </div>
+                </div>
               </div>
             </Reveal>
           ))}
         </div>
       </section>
 
-      {/* Bento capabilities */}
-      <section className="max-w-6xl mx-auto px-6 py-12">
-        <Reveal>
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-primary-700 mb-3">
-            Built differently
-          </h2>
-        </Reveal>
-        <Reveal delay={80}>
-          <p className="text-3xl font-bold tracking-tight max-w-xl mb-12">
-            Same browse-and-buy feel. A completely different trust model.
-          </p>
-        </Reveal>
+      {/* Value props */}
+      <section className="bg-white py-24">
+        <div className="max-w-6xl mx-auto px-6 grid sm:grid-cols-3 gap-12">
+          {[
+            { icon: <IconShieldCheck size={28} />, title: "Dean-verified accounts", desc: "Every account is gated by your college email and approved by a real dean before access opens up." },
+            { icon: <IconMessageCircle size={28} />, title: "Chat, not checkout", desc: "Message sellers directly and settle the deal in person. No payment gateway, no middleman fees." },
+            { icon: <IconBolt size={28} />, title: "List in under 60 seconds", desc: "Snap a photo, set a price, pick a category. Your listing is live before your next class starts." },
+          ].map((item) => (
+            <Reveal key={item.title}>
+              <div className="text-ink-primary">{item.icon}</div>
+              <h3 className="text-[16px] font-semibold text-ink-primary mt-4">{item.title}</h3>
+              <p className="text-[13px] text-ink-secondary leading-[1.6] mt-2">{item.desc}</p>
+            </Reveal>
+          ))}
+        </div>
+      </section>
 
-        <div className="grid grid-cols-1 sm:grid-cols-4 sm:grid-rows-2 gap-4">
-          <Reveal className="sm:col-span-2 sm:row-span-2">
-            <div className="h-full bg-slate-900 text-white rounded-3xl p-8 flex flex-col justify-between min-h-[280px]">
-              <div>
-                <FaShieldAlt className="text-2xl text-emerald-400 mb-4" />
-                <h3 className="text-xl font-semibold">
-                  Dean-verified students only
-                </h3>
-                <p className="text-slate-400 mt-2 text-sm leading-relaxed max-w-xs">
-                  Every account is gated by your college email domain and
-                  manually approved by your dean.
-                </p>
-              </div>
-              <div className="flex flex-col gap-2 mt-8">
-                {["Email domain checked", "Dean approval required", "Marketplace unlocked"].map(
-                  (line) => (
-                    <div key={line} className="flex items-center gap-2 text-sm text-slate-300">
-                      <FaCheckCircle className="text-emerald-400 text-xs" />
-                      {line}
-                    </div>
-                  )
-                )}
-              </div>
+      {/* Editorial / Story */}
+      <section className="max-w-6xl mx-auto px-6 py-24">
+        <div className="grid lg:grid-cols-[55%_45%] gap-12 items-center">
+          <Reveal>
+            <div className="aspect-[4/5] rounded-[28px] bg-[#F0F0F0] flex items-center justify-center text-[#CBCBCB]">
+              <IconShieldCheck size={120} />
             </div>
           </Reveal>
-
-          <Reveal delay={100} className="sm:col-span-2">
-            <div className="h-full bg-slate-50 border border-slate-200 rounded-3xl p-6 min-h-[130px]">
-              <h3 className="font-semibold text-slate-900">Chat, not checkout</h3>
-              <p className="text-slate-500 text-sm mt-1 mb-4">
-                No payment gateway — settle deals directly with the seller.
-              </p>
-              <div className="flex flex-col gap-2 max-w-xs">
-                <div className="self-start bg-white border border-slate-200 rounded-2xl rounded-bl-sm px-3 py-1.5 text-xs text-slate-600">
-                  Is the calculator still available?
-                </div>
-                <div className="self-end bg-slate-900 text-white rounded-2xl rounded-br-sm px-3 py-1.5 text-xs">
-                  Yes! Meet at the library?
-                </div>
-              </div>
-            </div>
-          </Reveal>
-
-          <Reveal delay={180}>
-            <div className="h-full bg-slate-50 border border-slate-200 rounded-3xl p-6 min-h-[130px] flex flex-col justify-between">
-              <FaBolt className="text-xl text-amber-500" />
-              <div>
-                <p className="text-2xl font-bold text-slate-900">&lt;60s</p>
-                <p className="text-slate-500 text-sm">to list an item</p>
-              </div>
-            </div>
-          </Reveal>
-
-          <Reveal delay={240}>
-            <div className="h-full bg-slate-50 border border-slate-200 rounded-3xl p-6 min-h-[130px] flex flex-col justify-between">
-              <div className="flex gap-2 text-xl text-rose-500">
-                <FaHeart />
-                <FaShoppingBag />
-              </div>
-              <div>
-                <p className="font-semibold text-slate-900">Wishlist & Cart</p>
-                <p className="text-slate-500 text-sm">Save it, or grab it now.</p>
-              </div>
+          <Reveal delay={100}>
+            <span className="text-[12px] font-medium uppercase tracking-[0.06em] text-ink-muted">
+              Why we built this
+            </span>
+            <h2 className="text-[36px] font-bold tracking-[-0.015em] leading-[1.1] max-w-[380px] mt-3">
+              Your campus already trades. It just didn't have a home.
+            </h2>
+            <p className="text-[15px] text-ink-secondary leading-[1.8] max-w-[440px] mt-5">
+              Every semester, the same secondhand textbooks and calculators get
+              passed around in scattered WhatsApp groups and noticeboards.
+              CampusCart puts all of it in one place — restricted to people who
+              actually go to your college, verified by someone who actually
+              works there.
+            </p>
+            <div className="flex items-center gap-6 mt-8">
+              <Link
+                to="/register"
+                className="inline-flex items-center h-11 px-6 rounded-full font-medium text-sm bg-accent text-accent-fg hover:bg-accent-hover transition-colors"
+              >
+                Get started
+              </Link>
+              <Link to="/login" className="text-sm font-medium text-ink-primary underline underline-offset-4">
+                Learn our story →
+              </Link>
             </div>
           </Reveal>
         </div>
       </section>
 
-      {/* Categories marquee */}
-      <Reveal>
-        <section className="py-16 border-y border-slate-100 overflow-hidden">
-          <p className="text-center text-sm font-semibold uppercase tracking-wide text-slate-400 mb-8">
-            Shop by category
+      {/* How it works */}
+      <section className="max-w-6xl mx-auto px-6 py-24 border-t border-border">
+        <Reveal>
+          <h2 className="text-[12px] font-semibold uppercase tracking-[0.06em] text-ink-secondary mb-3">
+            How it works
+          </h2>
+        </Reveal>
+        <Reveal delay={80}>
+          <p className="text-h2 font-bold tracking-[-0.015em] max-w-xl mb-16">
+            Three steps between you and a verified campus marketplace.
           </p>
-          <div className="flex w-max animate-marquee">
-            {[...CATEGORIES, ...CATEGORIES, ...CATEGORIES].map((cat, i) => (
-              <div
-                key={`${cat.label}-${i}`}
-                className="flex items-center gap-3 mx-4 px-6 py-3 rounded-full border border-slate-200 bg-white shrink-0"
-              >
-                <span className="text-primary-700">{cat.icon}</span>
-                <span className="text-sm font-medium text-slate-700 whitespace-nowrap">
-                  {cat.label}
-                </span>
+        </Reveal>
+
+        <div className="relative grid sm:grid-cols-3 gap-12">
+          <div className="hidden sm:block absolute top-5 left-0 right-0 h-px bg-border" />
+          {STEPS.map((step, i) => (
+            <Reveal key={step.n} delay={i * 100}>
+              <div className="relative">
+                <div className="w-10 h-10 rounded-full bg-accent text-accent-fg flex items-center justify-center text-xs font-mono mb-6 relative z-10">
+                  {step.n}
+                </div>
+                <h3 className="font-semibold text-[16px] text-ink-primary">{step.title}</h3>
+                <p className="text-ink-secondary mt-2 leading-relaxed text-[13px]">{step.desc}</p>
               </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* Social proof / reviews */}
+      <section className="bg-white py-24">
+        <div className="max-w-6xl mx-auto px-6">
+          <Reveal className="text-center">
+            <h2 className="text-h2 font-semibold tracking-[-0.015em]">What students say</h2>
+            <p className="text-[15px] text-ink-secondary mt-2">
+              <span className="text-amber-400">★★★★★</span> 4.9 out of 5{" "}
+              <span className="text-ink-muted">(2,140 reviews)</span>
+            </p>
+          </Reveal>
+
+          <div className="grid sm:grid-cols-3 gap-6 mt-12">
+            {REVIEWS.map((review, i) => (
+              <Reveal key={review.name} delay={i * 100}>
+                <div className="rounded-[28px] bg-white border border-border p-6 shadow-card h-full flex flex-col">
+                  <div className="flex text-amber-400 gap-0.5 mb-3">
+                    {Array.from({ length: 5 }).map((_, idx) => (
+                      <IconStarFilled key={idx} size={14} />
+                    ))}
+                  </div>
+                  <p className="text-[14px] leading-[1.7] italic text-ink-primary line-clamp-3 flex-1">
+                    "{review.text}"
+                  </p>
+                  <div className="flex items-center gap-2 mt-4">
+                    <span className="text-[13px] font-medium text-ink-primary">{review.name}</span>
+                    <span className="flex items-center gap-1 text-[11px] font-medium text-success">
+                      <IconCheck size={12} /> Verified buyer
+                    </span>
+                  </div>
+                </div>
+              </Reveal>
             ))}
           </div>
-        </section>
-      </Reveal>
+        </div>
+      </section>
 
       {/* Closing CTA */}
-      <section className="bg-slate-900 text-white">
+      <section className="bg-[#0A0A0A] text-white">
         <Reveal>
-          <div className="max-w-3xl mx-auto px-6 py-28 text-center">
-            <h2 className="text-4xl sm:text-5xl font-bold tracking-tight">
-              Your campus already trades.
-              <br />
-              Now it has a home.
+          <div className="max-w-[500px] mx-auto px-6 py-28 text-center">
+            <span className="text-[11px] font-medium uppercase tracking-[0.06em] text-white/50">
+              Get started
+            </span>
+            <h2 className="text-[32px] font-bold tracking-[-0.02em] mt-3">
+              Your campus already trades. Now it has a home.
             </h2>
-            <p className="text-slate-400 mt-5 max-w-md mx-auto">
-              Register with your college email and get verified by your dean
-              in minutes.
+            <p className="text-[14px] text-white/60 mt-4">
+              Register with your college email and get verified by your dean in
+              minutes.
             </p>
             <Link
               to="/register"
-              className="group inline-flex items-center gap-2 bg-white text-slate-900 px-8 py-4 rounded-full font-semibold text-sm mt-10 hover:bg-slate-100 transition-colors"
+              className="group inline-flex items-center gap-2 bg-white text-ink-primary px-7 h-11 rounded-full font-medium text-sm mt-8 hover:bg-white/90 transition-colors"
             >
               Get started for free
-              <FaArrowRight className="text-xs transition-transform group-hover:translate-x-1" />
+              <IconArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
             </Link>
+            <p className="text-[12px] text-white/40 mt-4">No spam. Just a dean checking you're real.</p>
           </div>
         </Reveal>
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900 border-t border-white/10">
-        <div className="max-w-6xl mx-auto px-6 py-10 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <span className="text-white font-semibold tracking-tight">
-            CampusCart
-          </span>
-          <p className="text-sm text-slate-500">
-            A college project marketplace — no payments, no shipping, just
-            students trading with students.
-          </p>
+      <footer className="bg-[#0A0A0A] border-t border-white/10">
+        <div className="max-w-6xl mx-auto px-6 py-16 grid sm:grid-cols-4 gap-10">
+          <div>
+            <span className="text-white font-bold tracking-[-0.02em]">CampusCart</span>
+            <p className="text-[14px] text-white/50 mt-3 leading-[1.6] max-w-[200px]">
+              A campus marketplace — no payments, no shipping, just verified students trading with students.
+            </p>
+          </div>
+          <div>
+            <h4 className="text-[12px] font-medium uppercase tracking-[0.06em] text-white/40 mb-4">Get Started</h4>
+            <ul className="flex flex-col gap-2.5 text-[14px] text-white/60">
+              <li><Link to="/register" className="hover:text-white transition-colors">Register</Link></li>
+              <li><Link to="/login" className="hover:text-white transition-colors">Login</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-[12px] font-medium uppercase tracking-[0.06em] text-white/40 mb-4">Categories</h4>
+            <ul className="flex flex-col gap-2.5 text-[14px] text-white/60">
+              <li>Textbooks & Notes</li>
+              <li>Electronics</li>
+              <li>Hostel Essentials</li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-[12px] font-medium uppercase tracking-[0.06em] text-white/40 mb-4">For Colleges</h4>
+            <ul className="flex flex-col gap-2.5 text-[14px] text-white/60">
+              <li><Link to="/admin/login" className="hover:text-white transition-colors">Dean / Admin login</Link></li>
+            </ul>
+          </div>
+        </div>
+        <div className="max-w-6xl mx-auto px-6 py-6 border-t border-white/10 flex items-center justify-between">
+          <span className="text-[13px] text-white/40">© 2026 CampusCart</span>
         </div>
       </footer>
     </div>
