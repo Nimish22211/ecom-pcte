@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { IconChevronDown, IconMenu2, IconX } from "@tabler/icons-react";
 import { useAuth } from "../context/AuthContext";
 
 const linkBase =
-  "text-sm font-medium text-slate-600 transition-colors hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded-md px-1 py-0.5";
-const linkActive = "text-primary-700";
+  "relative text-sm font-medium text-ink-secondary transition-colors hover:text-ink-primary after:absolute after:-bottom-1.5 after:left-1/2 after:h-px after:w-full after:-translate-x-1/2 after:scale-x-0 after:bg-ink-primary after:transition-transform after:duration-200 hover:after:scale-x-100 focus-visible:outline-none rounded-sm px-1 py-0.5";
+const linkActive = "text-ink-primary after:scale-x-100";
 
 function NavItem({ to, children }) {
   return (
@@ -41,12 +42,24 @@ function useCloseOnOutside(open, setOpen) {
   return ref;
 }
 
+function useScrolled(threshold = 60) {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > threshold);
+    onScroll();
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [threshold]);
+  return scrolled;
+}
+
 function Navbar({ type }) {
   const [studentMenu, setStudentMenu] = useState(false);
   const [deanMenu, setDeanMenu] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const scrolled = useScrolled();
 
   const studentMenuRef = useCloseOnOutside(studentMenu, setStudentMenu);
   const deanMenuRef = useCloseOnOutside(deanMenu, setDeanMenu);
@@ -57,11 +70,17 @@ function Navbar({ type }) {
   };
 
   return (
-    <nav className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur-md">
+    <nav
+      className={`sticky top-0 z-40 transition-colors duration-200 ${
+        scrolled
+          ? "border-b border-border bg-white/95 backdrop-blur-md"
+          : "border-b border-transparent bg-transparent"
+      }`}
+    >
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-3 sm:px-6">
         <Link
           to="/"
-          className="rounded-md text-lg font-bold text-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+          className="rounded-sm text-lg font-bold tracking-[-0.02em] text-ink-primary focus-visible:outline-none"
         >
           CampusCart
         </Link>
@@ -71,7 +90,7 @@ function Navbar({ type }) {
             <NavItem to="/login">Login</NavItem>
             <Link
               to="/register"
-              className="rounded-lg bg-primary-700 px-4 py-2 text-sm font-medium text-white shadow-card transition-colors hover:bg-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+              className="h-10 rounded-full bg-accent px-5 text-sm font-medium leading-10 text-accent-fg shadow-[0_2px_10px_rgba(0,0,0,0.18)] transition-all duration-200 hover:bg-accent-hover hover:shadow-[0_8px_24px_rgba(0,0,0,0.22)] hover:-translate-y-px"
             >
               Register
             </Link>
@@ -91,25 +110,12 @@ function Navbar({ type }) {
 
             <button
               type="button"
-              className="rounded-md p-2 text-slate-600 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 md:hidden"
+              className="rounded-full p-2 text-ink-secondary transition-colors hover:bg-[#F0F0F0] focus-visible:outline-none md:hidden"
               aria-label={mobileOpen ? "Close menu" : "Open menu"}
               aria-expanded={mobileOpen}
               onClick={() => setMobileOpen((v) => !v)}
             >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.8}
-                aria-hidden="true"
-              >
-                {mobileOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
+              {mobileOpen ? <IconX size={22} /> : <IconMenu2 size={22} />}
             </button>
 
             <div className="relative hidden md:block" ref={studentMenuRef}>
@@ -118,30 +124,24 @@ function Navbar({ type }) {
                 onClick={() => setStudentMenu((v) => !v)}
                 aria-haspopup="menu"
                 aria-expanded={studentMenu}
-                className="flex items-center gap-1 rounded-md px-1 py-0.5 text-sm font-medium text-slate-600 transition-colors hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                className="flex items-center gap-1 rounded-sm px-1 py-0.5 text-sm font-medium text-ink-secondary transition-colors hover:text-ink-primary focus-visible:outline-none"
               >
                 Student
-                <svg
-                  className={`h-4 w-4 transition-transform ${studentMenu ? "rotate-180" : ""}`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  aria-hidden="true"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
+                <IconChevronDown
+                  size={16}
+                  className={`transition-transform ${studentMenu ? "rotate-180" : ""}`}
+                />
               </button>
 
               {studentMenu && (
                 <div
                   role="menu"
-                  className="absolute right-0 mt-2 w-44 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-popover"
+                  className="absolute right-0 mt-2 w-44 overflow-hidden rounded-card border border-border bg-white shadow-dropdown"
                 >
                   <Link
                     to="/sold"
                     role="menuitem"
-                    className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                    className="block px-4 py-2 text-sm text-ink-primary hover:bg-[#F5F5F5]"
                     onClick={() => setStudentMenu(false)}
                   >
                     Sold Dashboard
@@ -150,7 +150,7 @@ function Navbar({ type }) {
                     type="button"
                     role="menuitem"
                     onClick={handleLogout}
-                    className="block w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"
+                    className="block w-full px-4 py-2 text-left text-sm text-ink-primary hover:bg-[#F5F5F5]"
                   >
                     Logout
                   </button>
@@ -159,7 +159,7 @@ function Navbar({ type }) {
             </div>
 
             {mobileOpen && (
-              <div className="absolute inset-x-0 top-full border-b border-slate-200 bg-white shadow-card md:hidden">
+              <div className="absolute inset-x-0 top-full border-b border-border bg-white shadow-card md:hidden">
                 <div className="flex flex-col gap-1 px-4 py-3">
                   <NavItem to="/browse">Browse</NavItem>
                   <NavItem to="/sell">Sell</NavItem>
@@ -171,7 +171,7 @@ function Navbar({ type }) {
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="rounded-md px-1 py-1.5 text-left text-sm font-medium text-slate-600 hover:text-primary-700"
+                    className="rounded-sm px-1 py-1.5 text-left text-sm font-medium text-ink-secondary hover:text-ink-primary"
                   >
                     Logout
                   </button>
@@ -192,31 +192,25 @@ function Navbar({ type }) {
                 onClick={() => setDeanMenu((v) => !v)}
                 aria-haspopup="menu"
                 aria-expanded={deanMenu}
-                className="flex items-center gap-1 rounded-md px-1 py-0.5 text-sm font-medium text-slate-600 transition-colors hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
+                className="flex items-center gap-1 rounded-sm px-1 py-0.5 text-sm font-medium text-ink-secondary transition-colors hover:text-ink-primary focus-visible:outline-none"
               >
                 Dean
-                <svg
-                  className={`h-4 w-4 transition-transform ${deanMenu ? "rotate-180" : ""}`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  aria-hidden="true"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
+                <IconChevronDown
+                  size={16}
+                  className={`transition-transform ${deanMenu ? "rotate-180" : ""}`}
+                />
               </button>
 
               {deanMenu && (
                 <div
                   role="menu"
-                  className="absolute right-0 mt-2 w-44 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-popover"
+                  className="absolute right-0 mt-2 w-44 overflow-hidden rounded-card border border-border bg-white shadow-dropdown"
                 >
                   <button
                     type="button"
                     role="menuitem"
                     onClick={handleLogout}
-                    className="block w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"
+                    className="block w-full px-4 py-2 text-left text-sm text-ink-primary hover:bg-[#F5F5F5]"
                   >
                     Logout
                   </button>
