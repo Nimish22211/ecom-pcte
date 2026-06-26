@@ -1,9 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
+* {
+  transition: var(--transition);
+}
 
-.MuiToolbar-root h6{
-    transform: translateY(10px) !important;
+html {
+  scroll-behavior: smooth;
+  /* Always reserve space for the vertical scrollbar so page width and
+     element positions don't shift when content height (e.g. product
+     count) crosses the scrollbar threshold. */
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
+}
+
+body {
+  background-color: #FAFAFA;
+  color: #0A0A0A;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Override default blue focus rings with the system's black outline */
+:focus-visible {
+  outline: 2px solid #0A0A0A;
+  outline-offset: 2px;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.MuiToolbar-root h6 {
+  transform: translateY(10px) !important;
 }
