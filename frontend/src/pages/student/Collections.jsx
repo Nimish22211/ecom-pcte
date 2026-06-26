@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
+import { IconSearch } from "@tabler/icons-react";
 import ProductCard from "../../components/ProductCard";
-import Loader from "../../components/Loader";
+import Skeleton from "../../components/ui/Skeleton";
 import { getProducts } from "../../services/api";
 
 const CATEGORIES = [
@@ -34,20 +35,16 @@ const Collections = () => {
   );
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <h1 className="text-3xl font-bold text-slate-900">Browse Products</h1>
+    <div className="w-full mx-auto max-w-6xl px-4 py-8 sm:px-6">
+      <div className="flex items-baseline justify-between">
+        <h1 className="text-h1 font-bold tracking-[-0.02em] text-ink-primary">Browse Products</h1>
+        {!loading && (
+          <span className="text-sm text-ink-muted">{filteredProducts.length} products</span>
+        )}
+      </div>
 
-      <div className="mt-6 flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 transition-colors focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500/30">
-        <svg
-          className="h-5 w-5 flex-shrink-0 text-slate-400"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-          aria-hidden="true"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
+      <div className="mt-6 flex items-center gap-2.5 rounded-[20px] border border-border bg-white px-5 h-11 shadow-[0_1px_3px_rgba(0,0,0,0.05)] transition-all duration-200 focus-within:border-ink-primary focus-within:shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
+        <IconSearch size={18} className="flex-shrink-0 text-ink-muted" aria-hidden="true" />
         <label htmlFor="product-search" className="sr-only">
           Search products
         </label>
@@ -57,7 +54,7 @@ const Collections = () => {
           placeholder="Search products..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full text-slate-900 placeholder:text-slate-400 outline-none"
+          className="w-full text-ink-primary placeholder:text-ink-muted outline-none bg-transparent"
         />
       </div>
 
@@ -68,10 +65,10 @@ const Collections = () => {
             type="button"
             onClick={() => setSelectedCategory(category)}
             aria-pressed={selectedCategory === category}
-            className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 ${
+            className={`rounded-full border px-5 h-9 text-sm font-medium transition-all duration-200 focus-visible:outline-none ${
               selectedCategory === category
-                ? "border-primary-700 bg-primary-700 text-white shadow-card"
-                : "border-slate-300 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50"
+                ? "border-ink-primary bg-accent text-accent-fg shadow-[0_2px_8px_rgba(0,0,0,0.18)]"
+                : "border-border bg-white text-ink-secondary hover:border-border-hover hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)]"
             }`}
           >
             {category}
@@ -80,20 +77,30 @@ const Collections = () => {
       </div>
 
       <div className="mt-8">
-        {loading && <Loader />}
+        {loading && (
+          <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i}>
+                <Skeleton className="aspect-square w-full" />
+                <Skeleton className="h-4 w-3/4 mt-3" />
+                <Skeleton className="h-4 w-1/3 mt-2" />
+              </div>
+            ))}
+          </div>
+        )}
         {!loading && error && (
-          <p role="alert" className="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">
+          <p role="alert" className="rounded-2xl bg-destructive/10 px-4 py-2 text-sm text-destructive">
             {error}
           </p>
         )}
         {!loading && !error && filteredProducts.length === 0 && (
-          <p className="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-12 text-center text-slate-500">
+          <p className="rounded-[28px] border border-dashed border-border bg-white px-4 py-12 text-center text-ink-secondary">
             No products found.
           </p>
         )}
 
         {!loading && !error && filteredProducts.length > 0 && (
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredProducts.map((product) => (
               <ProductCard key={product._id} product={product} />
             ))}

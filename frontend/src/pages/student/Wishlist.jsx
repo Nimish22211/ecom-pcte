@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
+import { IconHeart } from "@tabler/icons-react";
 import ProductCard from "../../components/ProductCard";
-import Loader from "../../components/Loader";
+import Skeleton from "../../components/ui/Skeleton";
 import { getWishlist, removeFromWishlist } from "../../services/api";
 
 const Wishlist = () => {
@@ -24,36 +25,37 @@ const Wishlist = () => {
     }
   };
 
-  if (loading) return <Loader />;
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+        <Skeleton className="h-8 w-48" />
+        <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i}>
+              <Skeleton className="aspect-square w-full" />
+              <Skeleton className="h-4 w-3/4 mt-3" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (wishlistItems.length === 0) {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
-        <svg
-          className="mx-auto h-12 w-12 text-slate-300"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={1.5}
-          aria-hidden="true"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-        </svg>
-        <h1 className="mt-4 text-xl font-semibold text-slate-900">
-          You haven't saved anything yet
-        </h1>
-        <p className="mt-2 text-slate-500">
-          Items you save will show up here so you can find them easily.
-        </p>
+        <IconHeart size={48} className="mx-auto text-ink-muted" aria-hidden="true" />
+        <h1 className="mt-4 text-[16px] font-medium text-ink-primary">You haven't saved anything yet</h1>
+        <p className="mt-2 text-ink-secondary">Items you save will show up here so you can find them easily.</p>
       </div>
     );
   }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <h1 className="text-3xl font-bold text-slate-900">My Wishlist</h1>
+      <h1 className="text-h1 font-bold tracking-[-0.02em] text-ink-primary">My Wishlist</h1>
       {error && (
-        <p role="alert" className="mt-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">
+        <p role="alert" className="mt-4 rounded-2xl bg-destructive/10 px-4 py-2 text-sm text-destructive">
           {error}
         </p>
       )}
@@ -63,8 +65,11 @@ const Wishlist = () => {
           <ProductCard key={item._id} product={item}>
             <button
               type="button"
-              onClick={() => removeFromWishlistHandler(item._id)}
-              className="mt-2 w-full rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 transition-colors hover:bg-red-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+              onClick={(e) => {
+                e.stopPropagation();
+                removeFromWishlistHandler(item._id);
+              }}
+              className="mt-2 w-full rounded-full border border-border h-9 text-sm font-medium text-ink-secondary transition-all duration-200 hover:border-destructive hover:text-destructive hover:shadow-[0_4px_12px_rgba(0,0,0,0.06)]"
             >
               Remove from Wishlist
             </button>

@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
-import Loader from "../../components/Loader";
+import { IconPackage } from "@tabler/icons-react";
+import Skeleton from "../../components/ui/Skeleton";
+import Badge from "../../components/ui/Badge";
+import Button from "../../components/ui/Button";
 import {
   getMyListings,
   markProductAsSold,
@@ -52,34 +55,34 @@ const MyListing = () => {
     }
   };
 
-  if (loading) return <Loader />;
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+        <Skeleton className="h-8 w-48" />
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="aspect-[4/3] w-full" />
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   if (listings.length === 0) {
     return (
       <div className="mx-auto max-w-md px-4 py-24 text-center">
-        <svg
-          className="mx-auto h-12 w-12 text-slate-300"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={1.5}
-          aria-hidden="true"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
-        </svg>
-        <h2 className="mt-4 text-xl font-semibold text-slate-900">
-          You haven't listed anything yet
-        </h2>
-        <p className="mt-2 text-slate-500">Sell something to get started.</p>
+        <IconPackage size={48} className="mx-auto text-ink-muted" aria-hidden="true" />
+        <h2 className="mt-4 text-[16px] font-medium text-ink-primary">You haven't listed anything yet</h2>
+        <p className="mt-2 text-ink-secondary">Sell something to get started.</p>
       </div>
     );
   }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-      <h1 className="text-3xl font-bold text-slate-900">My Listings</h1>
+      <h1 className="text-h1 font-bold tracking-[-0.02em] text-ink-primary">My Listings</h1>
       {error && (
-        <p role="alert" className="mt-4 rounded-lg bg-red-50 px-4 py-2 text-sm text-red-700">
+        <p role="alert" className="mt-4 rounded-2xl bg-destructive/10 px-4 py-2 text-sm text-destructive">
           {error}
         </p>
       )}
@@ -88,9 +91,9 @@ const MyListing = () => {
         {listings.map((item) => (
           <div
             key={item._id}
-            className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-card transition-shadow hover:shadow-card-hover"
+            className="overflow-hidden rounded-[28px] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-all duration-300 ease-out hover:-translate-y-1.5 hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.18)]"
           >
-            <div className="aspect-[4/3] overflow-hidden bg-slate-100">
+            <div className="aspect-[4/3] overflow-hidden bg-[#F5F5F5]">
               <img
                 src={item.images?.[0] || "https://via.placeholder.com/300x200"}
                 alt={item.title}
@@ -99,44 +102,26 @@ const MyListing = () => {
             </div>
             <div className="p-5">
               <div className="flex items-start justify-between gap-2">
-                <h2 className="line-clamp-1 text-lg font-semibold text-slate-900">{item.title}</h2>
-                <span
-                  className={
-                    item.status === "available"
-                      ? "shrink-0 rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-700"
-                      : "shrink-0 rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-500"
-                  }
-                >
+                <h2 className="line-clamp-1 text-[16px] font-semibold text-ink-primary">{item.title}</h2>
+                <Badge variant={item.status === "available" ? "success" : "default"} className="shrink-0">
                   {item.status === "available" ? "Available" : "Sold"}
-                </span>
+                </Badge>
               </div>
-              <p className="mt-1 font-bold text-primary-700">₹{item.price}</p>
+              <p className="mt-1 font-semibold text-ink-primary">₹{item.price}</p>
               <div className="mt-4 flex gap-2">
-              {item.status === "available" ? (
-                <button
-                  type="button"
-                  onClick={() => markAsSold(item._id)}
-                  className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
-                >
-                  Mark as Sold
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => markAsAvailable(item._id)}
-                  className="rounded-lg bg-amber-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
-                >
-                  Mark as Unsold
-                </button>
-              )}
+                {item.status === "available" ? (
+                  <Button variant="secondary" className="h-9 text-[13px]" onClick={() => markAsSold(item._id)}>
+                    Mark as Sold
+                  </Button>
+                ) : (
+                  <Button variant="secondary" className="h-9 text-[13px]" onClick={() => markAsAvailable(item._id)}>
+                    Mark as Unsold
+                  </Button>
+                )}
 
-              <button
-                type="button"
-                onClick={() => deleteListing(item._id)}
-                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
-              >
-                Delete
-              </button>
+                <Button variant="destructive" className="h-9 text-[13px]" onClick={() => deleteListing(item._id)}>
+                  Delete
+                </Button>
               </div>
             </div>
           </div>
