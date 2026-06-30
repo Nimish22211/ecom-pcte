@@ -29,8 +29,13 @@ export const AuthProvider = ({ children }) => {
 
   // Keep the socket connection in sync with login state. Runs on mount too,
   // so a page refresh while logged in reconnects automatically.
+  // When user changes (login/logout/switch account), disconnect and reconnect
+  // to ensure the new auth token is used.
   useEffect(() => {
     if (user) {
+      if (socket.connected) {
+        socket.disconnect();
+      }
       socket.connect();
     } else {
       socket.disconnect();

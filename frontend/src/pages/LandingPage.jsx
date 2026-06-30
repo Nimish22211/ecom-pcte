@@ -25,23 +25,23 @@ const TRUST_ITEMS = [
 const CATEGORIES = [
   {
     label: "Textbooks & Notes",
-    icon: <IconBook size={22} />,
+    image: "/images/Notes card.png",
   },
   {
     label: "Electronics",
-    icon: <IconDeviceLaptop size={22} />,
+    image: "/images/electronics card.png",
   },
   {
     label: "Hostel Essentials",
-    icon: <IconArmchair size={22} />,
+    image: "/images/hostel card.png",
   },
 ];
 
 const BESTSELLERS = [
-  { title: "Engineering Graphics, 4th Ed.", category: "Books", price: 300, rating: 4.9, reviews: 41 },
-  { title: "Casio FX-991ES Calculator", category: "Stationery", price: 500, rating: 4.8, reviews: 76 },
-  { title: "HP Pavilion, 8GB RAM", category: "Electronics", price: 25000, rating: 4.7, reviews: 18 },
-  { title: "Study Table Lamp", category: "Hostel", price: 350, rating: 4.9, reviews: 23 },
+  { title: "Engineering Graphics, 4th Ed.", category: "Books", price: 300, rating: 4.9, reviews: 41, image: "/images/Notes card.png" },
+  { title: "Casio FX-991ES Calculator", category: "Stationery", price: 500, rating: 4.8, reviews: 76, image: "/images/calculator.png" },
+  { title: "Wireless Earphones", category: "Electronics", price: 1500, rating: 4.7, reviews: 18, image: "/images/earphones.jpg" },
+  { title: "Study Table Lamp", category: "Hostel", price: 350, rating: 4.9, reviews: 23, image: "/images/lamp.png" },
 ];
 
 const STEPS = [
@@ -187,7 +187,11 @@ function LandingPage() {
           {/* Right: image card */}
           <div className="relative hidden lg:block">
             <div className="relative aspect-[4/5] rounded-[28px] bg-[#F5F5F5] overflow-hidden flex items-center justify-center">
-              <IconDeviceLaptop size={96} className="text-[#CBCBCB]" />
+              <img
+                src="/images/hero image.png"
+                alt="Featured electronics"
+                className="h-full w-full object-cover"
+              />
 
               <div
                 className="absolute top-4 right-4 flex items-center gap-1.5 rounded-pill bg-success/10 px-3 py-1.5 text-[12px] font-medium text-success"
@@ -202,11 +206,11 @@ function LandingPage() {
                 style={{ animation: "fade-up 0.5s ease-out 0.3s both" }}
               >
                 <div>
-                  <p className="text-sm font-medium text-ink-primary">HP Pavilion, 8GB RAM</p>
-                  <p className="text-sm font-semibold text-ink-primary mt-0.5">₹25,000</p>
+                  <p className="text-sm font-medium text-ink-primary">1,200+ Products Listed</p>
+                  <p className="text-xs font-medium text-ink-secondary mt-0.5">Books, Electronics & More</p>
                 </div>
                 <span className="flex h-9 px-3 items-center rounded-pill bg-accent text-accent-fg text-[13px] font-medium">
-                  Add
+                  Browse
                 </span>
               </div>
             </div>
@@ -247,9 +251,11 @@ function LandingPage() {
                 to="/login"
                 className="group relative block aspect-[3/4] overflow-hidden rounded-[28px] bg-[#F0F0F0]"
               >
-                <div className="absolute inset-0 flex items-center justify-center text-[#CBCBCB] transition-transform duration-300 group-hover:scale-105">
-                  <div className="scale-[3.2]">{cat.icon}</div>
-                </div>
+                <img
+                  src={cat.image}
+                  alt={cat.label}
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
                 <div className="absolute inset-x-0 bottom-0 flex items-center justify-between px-4 py-3.5 bg-white/85 backdrop-blur-sm">
                   <span className="text-[16px] font-semibold text-ink-primary">{cat.label}</span>
                   <IconArrowRight size={18} className="text-ink-primary" />
@@ -274,9 +280,11 @@ function LandingPage() {
             <Reveal key={item.title} delay={i * 80}>
               <div className="group">
                 <div className="relative aspect-square rounded-[28px] bg-[#F5F5F5] overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center text-[#CBCBCB] transition-transform duration-[400ms] group-hover:scale-[1.04]">
-                    <IconBook size={48} />
-                  </div>
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-[400ms] group-hover:scale-[1.04]"
+                  />
                   <button
                     type="button"
                     className="absolute bottom-3 left-1/2 h-[38px] -translate-x-1/2 translate-y-2 rounded-pill bg-white px-5 text-[13px] font-medium text-ink-primary opacity-0 shadow-card transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100"
@@ -322,8 +330,12 @@ function LandingPage() {
       <section className="max-w-6xl mx-auto px-6 py-24">
         <div className="grid lg:grid-cols-[55%_45%] gap-12 items-center">
           <Reveal>
-            <div className="aspect-[4/5] rounded-[28px] bg-[#F0F0F0] flex items-center justify-center text-[#CBCBCB]">
-              <IconShieldCheck size={120} />
+            <div className="aspect-[4/5] rounded-[28px] bg-[#F0F0F0] overflow-hidden">
+              <img
+                src="/images/why section.png"
+                alt="CampusCart story"
+                className="h-full w-full object-cover"
+              />
             </div>
           </Reveal>
           <Reveal delay={100}>
